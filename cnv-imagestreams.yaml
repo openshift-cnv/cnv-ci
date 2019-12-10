@@ -1,0 +1,9 @@
+kind: List
+apiVersion: v1
+items:
+  - kind: ImageStream
+    apiVersion: v1
+    metadata:
+      name: hco-bundle-registry
+    spec:
+      dockerImageRepository: "https://quay.io/repository/openshift-cnv/container-native-virtualization-hco-bundle-registry"
