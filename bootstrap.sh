@@ -10,7 +10,6 @@ CMD='oc'
 unset NAMESPACE
 
 function status(){
-    sleep 300
     "$CMD" get hco -n "$TARGET_NAMESPACE" -o yaml || true
     "$CMD" get pods -n "$TARGET_NAMESPACE" || true
     "$CMD" get hco hyperconverged-cluster -n "$TARGET_NAMESPACE" -o=jsonpath='{range .status.conditions[*]}{.type}{"\t"}{.status}{"\t"}{.message}{"\n"}{end}' || true
