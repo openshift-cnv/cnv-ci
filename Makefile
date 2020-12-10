@@ -1,7 +1,8 @@
 .PHONY: help disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv all
 
 help:
-	@echo "Run 'make all' to update configuration against the current KUBECONFIG"
+	@echo "Run 'make all' to test and deploy $CNV_VERSION/$OCP_VERSION on target cluster"
+	@echo "Use 'make quicklab' to setup target cluster for quicklab"
 
 all: disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv
 
@@ -19,3 +20,6 @@ deploy_cnv:
 
 test_cnv:
 	hack/test-cnv.sh
+
+quicklab:
+	hack/quicklab.sh

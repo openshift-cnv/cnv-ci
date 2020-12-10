@@ -1,0 +1,48 @@
+---
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  creationTimestamp: null
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 10-worker-registries
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 2.2.0
+    networkd: {}
+    passwd: {}
+    storage: {
+            "files": [
+                {
+                    "path": "/etc/containers/registries.conf",
+                    "filesystem": "root",
+                    "mode": 420,
+                    "contents": {
+                    "source": "data:;base64,W3JlZ2lzdHJpZXNdCiAgW3JlZ2lzdHJpZXMuc2VhcmNoXQogICAgcmVnaXN0cmllcyA9IFsicmVnaXN0cnkuYWNjZXNzLnJlZGhhdC5jb20iLCAiZG9ja2VyLmlvIl0KICBbcmVnaXN0cmllcy5pbnNlY3VyZV0KICAgIHJlZ2lzdHJpZXMgPSBbImJyZXctcHVscC1kb2NrZXIwMS53ZWIucHJvZC5leHQucGh4Mi5yZWRoYXQuY29tOjg4ODgiLCAKICAgICAgICAgICAgICAgICAgImNudi1xZS1zZXJ2ZXIucmhldmRldi5sYWIuZW5nLnJkdTIucmVkaGF0LmNvbTo1MDAwIiwKICAgICAgICAgICAgICAgICAgImNudi1xZS1zZXJ2ZXIucmhldmRldi5sYWIuZW5nLnJkdTIucmVkaGF0LmNvbTo1MDAxIl0gICAgICAgICAgICAgICAgICAKICBbcmVnaXN0cmllcy5ibG9ja10KICAgIHJlZ2lzdHJpZXMgPSBbXQo="
+                    }
+                },
+                {
+                    "path": "/etc/pki/ca-trust/source/anchors/RH-IT-Root-CA.crt",
+                    "filesystem": "root",
+                    "mode": 420,
+                    "contents": {
+                    "source": "data:;base64,LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVORENDQXh5Z0F3SUJBZ0lKQU51bkkwRDY2MmNuTUEwR0NTcUdTSWIzRFFFQkN3VUFNSUdsTVFzd0NRWUQKVlFRR0V3SlZVekVYTUJVR0ExVUVDQXdPVG05eWRHZ2dRMkZ5YjJ4cGJtRXhFREFPQmdOVkJBY01CMUpoYkdWcApaMmd4RmpBVUJnTlZCQW9NRFZKbFpDQklZWFFzSUVsdVl5NHhFekFSQmdOVkJBc01DbEpsWkNCSVlYUWdTVlF4Ckd6QVpCZ05WQkFNTUVsSmxaQ0JJWVhRZ1NWUWdVbTl2ZENCRFFURWhNQjhHQ1NxR1NJYjNEUUVKQVJZU2FXNW0KYjNObFkwQnlaV1JvWVhRdVkyOXRNQ0FYRFRFMU1EY3dOakUzTXpneE1Wb1lEekl3TlRVd05qSTJNVGN6T0RFeApXakNCcFRFTE1Ba0dBMVVFQmhNQ1ZWTXhGekFWQmdOVkJBZ01EazV2Y25Sb0lFTmhjbTlzYVc1aE1SQXdEZ1lEClZRUUhEQWRTWVd4bGFXZG9NUll3RkFZRFZRUUtEQTFTWldRZ1NHRjBMQ0JKYm1NdU1STXdFUVlEVlFRTERBcFMKWldRZ1NHRjBJRWxVTVJzd0dRWURWUVFEREJKU1pXUWdTR0YwSUVsVUlGSnZiM1FnUTBFeElUQWZCZ2txaGtpRwo5dzBCQ1FFV0VtbHVabTl6WldOQWNtVmthR0YwTG1OdmJUQ0NBU0l3RFFZSktvWklodmNOQVFFQkJRQURnZ0VQCkFEQ0NBUW9DZ2dFQkFMUXQ5T0pRaDZHQzVMVDFnODBxTmgwdTUwQlE0c1oveVo4YUVUeHQrNWxuUFZYNk1IS3oKYmZ3STZuTzFhTUc2ajliU3crNlVVeVBCSFA3OTYrRlQvcFRTK0swd3NEVjdjOVh2SG94SkJKSlUzOGNkTGtJMgpjL2k3bERxVGZUY2ZMTDJueVVCZDJmUURrMUIwZnhyc2toR0lJWjNpZlAxUHM0bHRUa3Y4aFJTb2IzVnROcVNvCkd4a0tmdkQyUEtqVFB4RFBXWXlydXk5aXJMWmlvTWZmaTNpL2dDdXQwWld0QXlPM01WSDVxV0YvZW5Ld2dQRVMKWDlwbytUZEN2UkIvUlVPYkJhTTc2MUVjckxTTTFHcUhOdWVTZnFuaG8zQWpMUTZkQm5QV2xvNjM4Wm0xVmViSwpCRUx5aGtMV01TRmtLd0RtbmUwalEwMlk0ZzA3NXZDS3ZDc0NBd0VBQWFOak1HRXdIUVlEVlIwT0JCWUVGSDdSCjR5QytVZWhJSVBldUw4WnF3M1B6YmdjWk1COEdBMVVkSXdRWU1CYUFGSDdSNHlDK1VlaElJUGV1TDhacXczUHoKYmdjWk1BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0RnWURWUjBQQVFIL0JBUURBZ0dHTUEwR0NTcUdTSWIzRFFFQgpDd1VBQTRJQkFRQkROdkQyVm05c0E1QTlBbE9KUjgrZW41WHo5aFhjeEpCNXBoeGNaUThqRm9HMDRWc2h2ZDBlCkxFblVyTWNmRmdJWjRuak1LVFFDTTRaRlVQQWlleUx4NGY1Mkh1RG9wcDNlNUp5SU1mVytLRmNOSXBLd0NzYWsKb1NvS3RJVU9zVUpLN3FCVlp4Y3JJeWVRVjJxY1lPZVpodFM1d0JxSXdPQWhGd2xDRVQ3WmU1OFFIbVM0OHNsagpTOUswSkFjcHMyeGRuR3UwZmt6aFNReFk4R1BRTkZUbHI2cllsZDUrSUQvaEhlUzc2Z3EwWUczcTZSTFdSa0hmCjRlVGtSaml2QWxFeHJGektjbGpDNGF4S1Fsbk92VkF6eitHbTMyVTB4UEJGNEJ5ZVBWeENKVUh3MVRzeVRtZWwKUnhORXA3eUhvWGN3bitmWG5hK3Q1SldoMWd4VVp0eTMKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=" 
+                    }
+                }
+            ]
+        }
+    systemd: {
+        "units": [
+            {
+                "contents": "[Unit]\nDescription=Update system CA\nAfter=syslog.target network.target\n\n[Service]\nType=oneshot\nExecStart=/usr/bin/update-ca-trust\nRemainAfterExit=true\n\n[Install]\nWantedBy=multi-user.target\n",
+                "enabled": true,
+                "name": "update-ca.service"
+            }
+        ]
+    }        
+  osImageURL: ""

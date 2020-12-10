@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
+
+echo "OCP_VERSION: $OCP_VERSION"
+
+eval "$(jq -r '."'"$OCP_VERSION"'" | to_entries[] | .key+"="+.value' version-mapping.json)"
+
+# These variables are set when the eval above is executed
+# shellcheck disable=SC2154
+echo "Using index_image: $index_image"
+# shellcheck disable=SC2154
+echo "Using bundle_version: $bundle_version"
 
 echo "creating brew catalog source"
-oc create -f - << EOF
+oc create -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
@@ -11,17 +21,22 @@ metadata:
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: $INDEX_IMAGE
+  image: $index_image
   displayName: Brew Catalog Source
   publisher: grpc
 EOF
 
-oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=60s
+while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --no-headers | wc -l)" -eq 0 ]; do
+    echo "waiting for catalog source pod to be created"
+    sleep 5
+done
+echo "waiting for catalog source pod to be ready"
+oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=180s
 
 oc create ns "${TARGET_NAMESPACE}"
 
 echo "creating subscription"
-oc create -f - << EOF
+oc create -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -35,11 +50,11 @@ spec:
   name: kubevirt-hyperconverged
   source: brew-catalog-source
   sourceNamespace: openshift-marketplace
-  startingCSV: kubevirt-hyperconverged-operator.$BUNDLE_VERSION
+  startingCSV: kubevirt-hyperconverged-operator.$bundle_version
 EOF
 
 echo "creating operator group"
-oc create -f - << EOF
+oc create -f - <<EOF
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
@@ -51,7 +66,7 @@ spec:
 EOF
 
 echo "waiting for operator pods to be created"
-while [ "$( oc get pods -n "${TARGET_NAMESPACE}" --no-headers | wc -l )" -lt 5 ]; do
+while [ "$(oc get pods -n "${TARGET_NAMESPACE}" --no-headers | wc -l)" -lt 5 ]; do
     sleep 5
 done
 
@@ -63,12 +78,12 @@ for i in $(seq 1 $counter); do
 done
 
 echo "waiting for HyperConverged operator crd to be created"
-while [ "$( oc get crd -n "${TARGET_NAMESPACE}" hyperconvergeds.hco.kubevirt.io --no-headers | wc -l )" -eq 0 ]; do
+while [ "$(oc get crd -n "${TARGET_NAMESPACE}" hyperconvergeds.hco.kubevirt.io --no-headers | wc -l)" -eq 0 ]; do
     sleep 5
 done
 
 echo "creating HyperConverged operator custom resource"
-oc create -f - << EOF
+oc create -f - <<EOF
 apiVersion: hco.kubevirt.io/v1beta1
 kind: HyperConverged
 metadata:

@@ -73,7 +73,7 @@ jq '.' /tmp/message.json
   }
 }
 
-$ jq '. + '"$(jq -r '{ (.index.ocp_version | ltrimstr("v")): { "index_image": .index.index_image, "bundle_version": (.index.added_bundle_images[] | select(. | contains("hco-bundle-registry")) | split(":") | .[1]) } }' /tmp/message.json)" version-mapping_old.json
+$ jq '. + '"$(jq -r '{ (.index.ocp_version | ltrimstr("v")): { "index_image": .index.index_image, "bundle_version": (.index.added_bundle_images[] | select(. | contains("hco-bundle-registry")) | split(":") | .[1] ) } }' /tmp/message.json)" version-mapping_old.json
 {
   "4.6": {
     "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:1234",
