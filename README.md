@@ -13,7 +13,7 @@ $ jq -r '{ (.index.ocp_version | ltrimstr("v")): { "index_image": .index.index_i
 ## How to update the version mapping with content of message of UMB
 
 ```sh
-$ cat version-mapping_old.json
+$ cat version-mapping.json
 {
   "4.6": {
     "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:1234",
@@ -73,7 +73,8 @@ jq '.' /tmp/message.json
   }
 }
 
-$ jq '. + '"$(jq -r '{ (.index.ocp_version | ltrimstr("v")): { "index_image": .index.index_image, "bundle_version": (.index.added_bundle_images[] | select(. | contains("hco-bundle-registry")) | split(":") | .[1] ) } }' /tmp/message.json)" version-mapping_old.json
+$ ./hack/update-version-mapping.sh -i version-mapping.json -m /tmp/message.json
+$ cat version-mapping.json
 {
   "4.6": {
     "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:1234",
