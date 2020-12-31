@@ -4,7 +4,7 @@
     "bundle_version": "v2.5.0-66"
   },
   "4.7": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:35376",
-    "bundle_version": "v2.6.0-436"
+    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:35415",
+    "bundle_version": "v2.6.0-439"
   }
 }
