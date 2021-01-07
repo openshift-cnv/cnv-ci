@@ -31,6 +31,12 @@ while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-cat
     sleep 5
 done
 echo "waiting for catalog source pod to be ready"
+## temp addition
+echo 60
+oc get pods -n openshift-marketplace
+oc describe pods -n openshift-marketplace
+oc get events -n openshift-marketplace
+## ---
 oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=180s
 
 oc create ns "${TARGET_NAMESPACE}"
