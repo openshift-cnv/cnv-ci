@@ -36,6 +36,7 @@ echo 60
 oc get pods -n openshift-marketplace
 oc describe pods -n openshift-marketplace
 oc get events -n openshift-marketplace
+oc get imagecontentsourcepolicy -o yaml
 ## ---
 oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=180s
 
