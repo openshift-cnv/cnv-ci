@@ -31,10 +31,12 @@ while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-cat
     sleep 5
 done
 echo "waiting for catalog source pod to be ready"
+
 oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=180s
 
 oc create ns "${TARGET_NAMESPACE}"
 
+STARTING_CSV=${bundle_version%-*}
 echo "creating subscription"
 oc create -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
@@ -50,7 +52,7 @@ spec:
   name: kubevirt-hyperconverged
   source: brew-catalog-source
   sourceNamespace: openshift-marketplace
-  startingCSV: kubevirt-hyperconverged-operator.$bundle_version
+  startingCSV: ${STARTING_CSV}
 EOF
 
 echo "creating operator group"
@@ -81,6 +83,9 @@ echo "waiting for HyperConverged operator crd to be created"
 while [ "$(oc get crd -n "${TARGET_NAMESPACE}" hyperconvergeds.hco.kubevirt.io --no-headers | wc -l)" -eq 0 ]; do
     sleep 5
 done
+
+echo "wait for hco-operator and hco-webhook to be ready"
+oc wait deployment hco-operator hco-webhook --for condition=Available -n "${TARGET_NAMESPACE}" --timeout="20m"
 
 echo "creating HyperConverged operator custom resource"
 oc create -f - <<EOF
