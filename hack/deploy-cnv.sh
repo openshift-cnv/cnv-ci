@@ -52,7 +52,7 @@ spec:
   name: kubevirt-hyperconverged
   source: brew-catalog-source
   sourceNamespace: openshift-marketplace
-  startingCSV: ${STARTING_CSV}
+  startingCSV: kubevirt-hyperconverged-operator.${STARTING_CSV}
 EOF
 
 echo "creating operator group"
