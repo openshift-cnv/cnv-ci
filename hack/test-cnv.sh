@@ -14,11 +14,16 @@ oc create -n "${TARGET_NAMESPACE}" -f ./manifests/testing/kubevirt-testing-infra
 
 echo "starting tests"
 ${TESTS_BINARY} \
-    -installed-namespace="$TARGET_NAMESPACE" \
     -cdi-namespace="$TARGET_NAMESPACE" \
     -config=./manifests/testing/kubevirt-testing-configuration.json \
+    -installed-namespace="$TARGET_NAMESPACE" \
+    -junit-output="${ARTIFACTS_DIR}/junit.functest.xml" \
     -kubeconfig="$KUBECONFIG" \
     -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
+    -ginkgo.noColor \
+    -ginkgo.seed=0 \
     -ginkgo.skip='(Slirp Networking)|(with CPU spec)|(with TX offload disabled)|(with cni flannel and ptp plugin interface)|(with ovs-cni plugin)|(test_id:1752)|(SRIOV)|(with EFI)|(Operator)|(GPU)|(DataVolume Integration)|(test_id:3468)|(test_id:3466)|(test_id:1015)|(rfe_id:393)' \
-    -junit-output="${ARTIFACTS_DIR}/junit.functest.xml" \
-    -ginkgo.seed=0
+    -ginkgo.slowSpecThreshold=60 \
+    -ginkgo.succinct \
+    -oc-path="$(which oc)" \
+    -test.timeout 420m
