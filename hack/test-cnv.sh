@@ -11,7 +11,7 @@ curl -Lo "$TESTS_BINARY" "https://github.com/kubevirt/kubevirt/releases/download
 chmod +x "$TESTS_BINARY"
 
 echo "create testing infrastructure"
-oc create -n "${TARGET_NAMESPACE}" -f ./manifests/testing/kubevirt-testing-infra.yaml
+[ "$(oc get PersistentVolume host-path-disk-alpine)" ] || oc create -n "${TARGET_NAMESPACE}" -f ./manifests/testing/kubevirt-testing-infra.yaml
 
 echo "waiting for all pods to be ready"
 oc wait pods -n "${TARGET_NAMESPACE}" --all --for condition=Ready --timeout=10m
@@ -31,4 +31,4 @@ ${TESTS_BINARY} \
     -ginkgo.succinct \
     -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
-    -test.timeout 420m
+    -utility-container-prefix=quay.io/kubevirt
