@@ -61,10 +61,12 @@ spec:
       labels:
         kubevirt.io: cdi-http-import-server
     spec:
+      securityContext:
+        runAsUser: 0
       serviceAccountName: kubevirt-testing
       containers:
         - name: cdi-http-import-server
-          image: kubevirt/cdi-http-import-server:latest
+          image: quay.io/kubevirt/cdi-http-import-server:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -97,7 +99,7 @@ spec:
       serviceAccountName: kubevirt-testing
       containers:
         - name: target
-          image: kubevirt/disks-images-provider:latest
+          image: quay.io/kubevirt/disks-images-provider:latest
           imagePullPolicy: Always
           volumeMounts:
           - name: images
