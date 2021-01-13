@@ -19,6 +19,7 @@ deploy_cnv:
 	hack/deploy-cnv.sh
 
 test_cnv:
+	hack/patch-hco-pre-test.sh
 	hack/test-cnv.sh
 
 quicklab:
