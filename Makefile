@@ -6,7 +6,7 @@ help:
 
 # This target is kept around since it's still being referenced in the openshift/release job configuration.
 # Once the job configuration is modified to run `make deploy_test`, it can be removed.
-all: deploy_cnv
+all: deploy_test
 
 deploy_test: disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv
 
