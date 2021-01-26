@@ -1,10 +1,10 @@
 {
   "4.6": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:12345",
-    "bundle_version": "v2.5.0-66"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:41080",
+    "bundle_version": "v2.5.4-1"
   },
   "4.7": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:31338",
-    "bundle_version": "v2.6.0-355"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:41478",
+    "bundle_version": "v2.6.0-515"
   }
 }
