@@ -10,8 +10,7 @@ all: deploy_test
 
 deploy_test: disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv
 
-upgrade_test:
-	true
+upgrade_test: update_pull_secret set_imagecontentsourcepolicy upgrade_cnv test_cnv
 
 disable_default_catalog_source:
 	hack/disable-default-catalog-source.sh
