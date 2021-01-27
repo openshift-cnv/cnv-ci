@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 echo "OCP_VERSION: $OCP_VERSION"
 
 eval "$(jq -r '."'"$OCP_VERSION"'" | to_entries[] | .key+"="+.value' version-mapping.json)"
@@ -12,27 +14,8 @@ echo "Using index_image: $index_image"
 # shellcheck disable=SC2154
 echo "Using bundle_version: $bundle_version"
 
-echo "creating brew catalog source"
-oc create -f - <<EOF
-apiVersion: operators.coreos.com/v1alpha1
-kind: CatalogSource
-metadata:
-  name: brew-catalog-source
-  namespace: openshift-marketplace
-spec:
-  sourceType: grpc
-  image: $index_image
-  displayName: Brew Catalog Source
-  publisher: grpc
-EOF
-
-while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --no-headers | wc -l)" -eq 0 ]; do
-    echo "waiting for catalog source pod to be created"
-    sleep 5
-done
-echo "waiting for catalog source pod to be ready"
-
-oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=180s
+echo "setting up brew catalog source"
+$SCRIPT_DIR/create_brew_catalogsource.sh
 
 oc create ns "${TARGET_NAMESPACE}"
 
@@ -67,36 +50,6 @@ spec:
   - "${TARGET_NAMESPACE}"
 EOF
 
-echo "waiting for operator pods to be created"
-while [ "$(oc get pods -n "${TARGET_NAMESPACE}" --no-headers | wc -l)" -lt 5 ]; do
-    sleep 5
-done
+echo "waiting for HyperConverged operator to become ready"
+$SCRIPT_DIR/wait_for_hco.sh
 
-counter=3
-for i in $(seq 1 $counter); do
-    echo "waiting for operator pods to be ready (try $i)"
-    oc wait pods -n "${TARGET_NAMESPACE}" --all --for condition=Ready --timeout=10m && break
-    sleep 5
-done
-
-echo "waiting for HyperConverged operator crd to be created"
-while [ "$(oc get crd -n "${TARGET_NAMESPACE}" hyperconvergeds.hco.kubevirt.io --no-headers | wc -l)" -eq 0 ]; do
-    sleep 5
-done
-
-echo "wait for hco-operator and hco-webhook to be ready"
-oc wait deployment hco-operator hco-webhook --for condition=Available -n "${TARGET_NAMESPACE}" --timeout="20m"
-
-echo "creating HyperConverged operator custom resource"
-oc create -f - <<EOF
-apiVersion: hco.kubevirt.io/v1beta1
-kind: HyperConverged
-metadata:
-  name: kubevirt-hyperconverged
-  namespace: "${TARGET_NAMESPACE}"
-spec:
-  BareMetalPlatform: true
-EOF
-
-echo "waiting for HyperConverged operator to be available"
-oc wait -n "${TARGET_NAMESPACE}" HyperConverged kubevirt-hyperconverged --for condition=Available --timeout=20m
