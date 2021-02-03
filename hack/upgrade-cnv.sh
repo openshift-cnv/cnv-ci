@@ -62,7 +62,7 @@ $SCRIPT_DIR/wait-for-hco.sh
 OLD_CSV=$(oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath="{.status.installedCSV}")
 
 echo "waiting for the previous CSV installation to complete"
-$SCRIPT_DIR/retry.sh 60 10 "oc get ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE -o jsonpath='{.status.phase}'') | grep 'Succeeded'"
+$SCRIPT_DIR/retry.sh 60 10 "oc get ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE -o jsonpath='{.status.phase}' | grep 'Succeeded'"
 
 echo "setting up brew catalog source"
 $SCRIPT_DIR/create-brew-catalogsource.sh
