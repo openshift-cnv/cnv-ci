@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
 if [ $# -ne 3 ]; then
     echo 'Usage: retry <num retries> <wait retry secs> "<command>"'
     exit 1
