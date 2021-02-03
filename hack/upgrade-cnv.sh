@@ -61,10 +61,8 @@ $SCRIPT_DIR/wait_for_hco.sh
 
 OLD_CSV=$(oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath="{.status.installedCSV}")
 
-while [ $(oc get ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE -o jsonpath="{.status.phase}") != "Succeeded" ]; do
-	echo "waiting for the previous CSV installation to complete"
-	sleep 10
-done
+echo "waiting for the previous CSV installation to complete"
+$SCRIPT_DIR/retry.sh 60 10 "oc get ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE -o jsonpath='{.status.phase}'') | grep 'Succeeded'"
 
 echo "setting up brew catalog source"
 $SCRIPT_DIR/create_brew_catalogsource.sh
@@ -76,29 +74,14 @@ echo "waiting for the new CSV installation to commence"
 sleep 60
 
 echo "waiting for the subscription's currentCSV to move to the new catalog source"
-while true; do
-  CURRENT_CSV=$(oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath="{.status.currentCSV}")
-  if [ "$CURRENT_CSV" != "$OLD_CSV"]; then
-    NEW_CSV=$CURRENT_CSV
-    break
-  fi
+$SCRIPT_DIR/retry.sh 30 10 "oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}' | grep -v $OLD_CSV"
 
-  echo "waiting for the subscription's currentCSV to move to the new catalog source"
-  sleep 10
-done
+NEW_CSV=$(oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}')
 
 echo "waiting for HyperConverged operator to become ready"
 $SCRIPT_DIR/wait_for_hco.sh
 
 echo "waiting for the subscription's installedCSV to move to the new catalog source"
-while true; do
-  INSTALLED_CSV=$(oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath="{.status.installedCSV}")
-  if [ "$INSTALLED_CSV" = "$CURRENT_CSV" ]; then
-    break
-  fi
-
-  echo "waiting for the subscription's installedCSV to move to the new catalog source"
-  sleep 30
-done
+$SCRIPT_DIR/retry.sh 60 10 "oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}' | grep $NEW_CSV"
 
 echo "HyperConverged operator upgrade successfully completed"

@@ -2,30 +2,23 @@
 
 set -euo pipefail
 
-#
-echo "waiting for operator pods to be created"
-while [ "$(oc get pods -n "${TARGET_NAMESPACE}" --no-headers | wc -l)" -lt 5 ]; do
-    sleep 5
-done
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-counter=3
-for i in $(seq 1 $counter); do
-    echo "waiting for operator pods to be ready (try $i)"
-    oc wait pods -n "${TARGET_NAMESPACE}" --all --for condition=Ready --timeout=10m && break
-    sleep 5
-done
+echo "waiting for hco-operator deployment to be created"
+$SCRIPT_DIR/retry.sh 30 10 "oc get deployment hco-operator -n $TARGET_NAMESPACE"
+
+echo "waiting for hco-webhook deployment to be created"
+$SCRIPT_DIR/retry.sh 30 10 "oc get deployment hco-webhook -n $TARGET_NAMESPACE"
 
 echo "waiting for hco-operator and hco-webhook to be ready"
-oc wait deployment hco-operator hco-webhook --for condition=Available -n "${TARGET_NAMESPACE}" --timeout="20m"
+oc wait deployment hco-operator hco-webhook -n $TARGET_NAMESPACE --for condition=Available --timeout=30m
 
 # Wait a few more seconds for the hco-webhook Service and Endpoints objects
 # to be updated and propagated through the system, to prevent connection errors to the webhook.
 sleep 20s
 
 echo "waiting for HyperConverged operator CRD to be created"
-while [ "$(oc get crd -n "${TARGET_NAMESPACE}" hyperconvergeds.hco.kubevirt.io --no-headers | wc -l)" -eq 0 ]; do
-    sleep 5
-done
+$SCRIPT_DIR/retry.sh 30 10 "oc get crd hyperconvergeds.hco.kubevirt.io"
 
 echo "checking if HyperConverged operator CR already exists"
 if [ "$(oc get HyperConverged kubevirt-hyperconverged -n "${TARGET_NAMESPACE}" --no-headers | wc -l)" -eq 0 ]; then
@@ -53,4 +46,4 @@ if [[ "${KUBEVIRT_RELEASE}" =~ 0.34 ]]; then
 fi
 
 echo "waiting for HyperConverged operator to be available"
-oc wait -n "${TARGET_NAMESPACE}" HyperConverged kubevirt-hyperconverged --for condition=Available --timeout=20m
+oc wait HyperConverged kubevirt-hyperconverged -n $TARGET_NAMESPACE --for condition=Available --timeout=30m
