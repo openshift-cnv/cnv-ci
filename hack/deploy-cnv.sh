@@ -15,7 +15,7 @@ echo "Using index_image: $index_image"
 echo "Using bundle_version: $bundle_version"
 
 echo "setting up brew catalog source"
-$SCRIPT_DIR/create_brew_catalogsource.sh
+$SCRIPT_DIR/create-brew-catalogsource.sh
 
 oc create ns "${TARGET_NAMESPACE}"
 
@@ -51,4 +51,4 @@ spec:
 EOF
 
 echo "waiting for HyperConverged operator to become ready"
-$SCRIPT_DIR/wait_for_hco.sh
+$SCRIPT_DIR/wait-for-hco.sh

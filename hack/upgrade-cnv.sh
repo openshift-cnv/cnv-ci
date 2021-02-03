@@ -53,7 +53,7 @@ spec:
 EOF
 
 echo "waiting for HyperConverged operator to become ready"
-$SCRIPT_DIR/wait_for_hco.sh
+$SCRIPT_DIR/wait-for-hco.sh
 
 #=======================================
 # Upgrade HCO to latest build from brew
@@ -65,7 +65,7 @@ echo "waiting for the previous CSV installation to complete"
 $SCRIPT_DIR/retry.sh 60 10 "oc get ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE -o jsonpath='{.status.phase}'') | grep 'Succeeded'"
 
 echo "setting up brew catalog source"
-$SCRIPT_DIR/create_brew_catalogsource.sh
+$SCRIPT_DIR/create-brew-catalogsource.sh
 
 echo "patching the subscription to switch to the brew catalog source"
 oc patch subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE --type=merge --patch='{"spec": {"source": "brew-catalog-source"}}'
@@ -79,7 +79,7 @@ $SCRIPT_DIR/retry.sh 30 10 "oc get subscription kubevirt-hyperconverged -n $TARG
 NEW_CSV=$(oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}')
 
 echo "waiting for HyperConverged operator to become ready"
-$SCRIPT_DIR/wait_for_hco.sh
+$SCRIPT_DIR/wait-for-hco.sh
 
 echo "waiting for the subscription's installedCSV to move to the new catalog source"
 $SCRIPT_DIR/retry.sh 60 10 "oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}' | grep $NEW_CSV"
