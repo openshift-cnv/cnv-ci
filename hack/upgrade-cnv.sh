@@ -84,4 +84,7 @@ $SCRIPT_DIR/wait-for-hco.sh
 echo "waiting for the subscription's installedCSV to move to the new catalog source"
 $SCRIPT_DIR/retry.sh 60 10 "oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}' | grep $NEW_CSV"
 
+echo "waiting for the previous CSV to be completely removed"
+oc wait ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE --for delete --timeout=10m
+
 echo "HyperConverged operator upgrade successfully completed"
