@@ -16,12 +16,16 @@ echo "create testing infrastructure"
 echo "waiting for all pods to be ready"
 oc wait pods -n "${TARGET_NAMESPACE}" --all --for condition=Ready --timeout=10m
 
+mkdir -p "$ARTIFACT_DIR"
+# required to be set for test binary
+export ARTIFACTS=${ARTIFACT_DIR}
+
 echo "starting tests"
 ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
     -config=./manifests/testing/kubevirt-testing-configuration.json \
     -installed-namespace="$TARGET_NAMESPACE" \
-    -junit-output="${ARTIFACTS_DIR}/junit.functest.xml" \
+    -junit-output="${ARTIFACTS}/junit.functest.xml" \
     -kubeconfig="$KUBECONFIG" \
     -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
     -ginkgo.noColor \
