@@ -1,12 +1,9 @@
-.PHONY: help disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv upgrade_cnv test_cnv all deploy_test upgrade_test
+.PHONY: help disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv upgrade_cnv test_cnv deploy_test upgrade_test
 
 help:
-	@echo "Run 'make all' to test and deploy $CNV_VERSION/$OCP_VERSION on target cluster"
+	@echo "Run 'make deploy_test' to deploy and test $CNV_VERSION/$OCP_VERSION on target cluster"
+	@echo "Run 'make upgrade_test' to deploy, upgrade and test $CNV_VERSION/$OCP_VERSION on target cluster"
 	@echo "Use 'make quicklab' to setup target cluster for quicklab"
-
-# This target is kept around since it's still being referenced in the openshift/release job configuration.
-# Once the job configuration is modified to run `make deploy_test`, it can be removed.
-all: deploy_test
 
 deploy_test: disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv
 
