@@ -32,4 +32,5 @@ ${TESTS_BINARY} \
     -ginkgo.succinct \
     -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
-    -utility-container-prefix=quay.io/kubevirt
+    -utility-container-prefix=quay.io/kubevirt \
+    -test.timeout=75m
