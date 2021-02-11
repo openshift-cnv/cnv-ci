@@ -84,7 +84,15 @@ $SCRIPT_DIR/wait-for-hco.sh
 echo "waiting for the subscription's installedCSV to move to the new catalog source"
 $SCRIPT_DIR/retry.sh 60 10 "oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}' | grep $NEW_CSV"
 
+# oc currently fails if the resource doesn't exist while the command is executed;
+# this will be resolved in kubectl v1.21: https://github.com/kubernetes/kubernetes/pull/96702
+# till then, we manually test for 404 in the output string (both with v1.20 and pre-v.120 formats)
 echo "waiting for the previous CSV to be completely removed"
-oc wait ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE --for delete --timeout=10m
+WAIT_CSV_OUTPUT=$(oc wait ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE --for delete --timeout=10m 2>&1)
+if [ $? -ne 0 ] && ! grep -qE "NotFound|(no matching resources found)" <(echo "$WAIT_CSV_OUTPUT"); then
+  echo "$WAIT_CSV_OUTPUT"
+  exit 1
+fi
+echo "$WAIT_CSV_OUTPUT"
 
 echo "HyperConverged operator upgrade successfully completed"
