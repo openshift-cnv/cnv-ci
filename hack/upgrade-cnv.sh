@@ -95,4 +95,11 @@ if [ $? -ne 0 ] && ! grep -qE "NotFound|(no matching resources found)" <(echo "$
 fi
 echo "$WAIT_CSV_OUTPUT"
 
+# The previous CSV get deleted with "background deletion" propagation
+# policy, i.e. before its owned resources are completely removed.
+# Therefore, we wait for a few more minutes to let these resources be
+# completely deleted, to avoid any conflicts in the subsequent test execution.
+echo "waiting for residual resources to complete deletion"
+sleep 10m
+
 echo "HyperConverged operator upgrade successfully completed"
