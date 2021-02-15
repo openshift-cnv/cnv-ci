@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 echo "downloading the test binary"
 BIN_DIR="$(pwd)/_out" && mkdir -p "${BIN_DIR}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 echo "applying machineconfigs"
 oc create -f manifests/brew/10-master-registries.yaml

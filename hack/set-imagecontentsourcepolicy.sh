@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 echo "creating imageContentSourcePolicy"
 oc create -f - <<EOF
