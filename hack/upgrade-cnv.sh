@@ -70,9 +70,6 @@ $SCRIPT_DIR/create-brew-catalogsource.sh
 echo "patching the subscription to switch to the brew catalog source"
 oc patch subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE --type=merge --patch='{"spec": {"source": "brew-catalog-source"}}'
 
-echo "waiting for the new CSV installation to commence"
-sleep 60
-
 echo "waiting for the subscription's currentCSV to move to the new catalog source"
 $SCRIPT_DIR/retry.sh 30 10 "oc get subscription kubevirt-hyperconverged -n $TARGET_NAMESPACE -o jsonpath='{.status.currentCSV}' | grep -v $OLD_CSV"
 

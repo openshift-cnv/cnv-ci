@@ -33,4 +33,4 @@ ${TESTS_BINARY} \
     -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
-    -test.timeout=75m
+    -test.timeout=2h
