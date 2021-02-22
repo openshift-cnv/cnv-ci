@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ "${KUBEVIRT_RELEASE}" =~ 0.34 ]]; then
+    echo "Skipping scaling down the hco-operator pod due to older version"
+    return
+fi
+
 set -euo pipefail
 
 echo "scale down hco-operator, as it's still using the config map for KubeVirt"

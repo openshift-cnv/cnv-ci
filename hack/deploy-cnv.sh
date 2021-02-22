@@ -98,5 +98,10 @@ spec:
   BareMetalPlatform: true
 EOF
 
+if [[ "${KUBEVIRT_RELEASE}" =~ 0.34 ]]; then
+    echo "creating KubeVirt config map"
+    oc create -f "https://storage.googleapis.com/kubevirt-prow/devel/release/kubevirt/kubevirt/v0.34.2/manifests/testing/kubevirt-config.yaml"
+fi
+
 echo "waiting for HyperConverged operator to be available"
 oc wait -n "${TARGET_NAMESPACE}" HyperConverged kubevirt-hyperconverged --for condition=Available --timeout=20m
