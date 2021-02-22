@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 oc delete HyperConverged -n "${TARGET_NAMESPACE}" kubevirt-hyperconverged
 oc delete OperatorGroup -n "${TARGET_NAMESPACE}" openshift-cnv-group

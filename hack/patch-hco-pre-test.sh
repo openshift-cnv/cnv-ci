@@ -5,7 +5,7 @@ if [[ "${KUBEVIRT_RELEASE}" =~ 0.34 ]]; then
     return
 fi
 
-set -euo pipefail
+set -euxo pipefail
 
 echo "scale down hco-operator, as it's still using the config map for KubeVirt"
 oc patch deployment hco-operator -n "${TARGET_NAMESPACE}" --patch '{"spec":{"replicas":0}}'
