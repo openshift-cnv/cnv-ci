@@ -124,6 +124,7 @@ spec:
           hostPath:
             path: /mnt/local-storage
             type: DirectoryOrCreate
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:

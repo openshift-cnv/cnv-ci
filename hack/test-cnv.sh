@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 echo "downloading the test binary"
 BIN_DIR="$(pwd)/_out" && mkdir -p "${BIN_DIR}"
@@ -13,8 +13,9 @@ chmod +x "$TESTS_BINARY"
 echo "create testing infrastructure"
 [ "$(oc get PersistentVolume host-path-disk-alpine)" ] || oc create -n "${TARGET_NAMESPACE}" -f ./manifests/testing/kubevirt-testing-infra.yaml
 
-echo "waiting for all pods to be ready"
-oc wait pods -n "${TARGET_NAMESPACE}" --all --for condition=Ready --timeout=10m
+echo "waiting for testing infrastructure to be ready"
+oc wait deployment cdi-http-import-server -n "${TARGET_NAMESPACE}" --for condition=Available --timeout=10m
+oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=10m
 
 echo "starting tests"
 ${TESTS_BINARY} \
@@ -31,4 +32,5 @@ ${TESTS_BINARY} \
     -ginkgo.succinct \
     -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
-    -utility-container-prefix=quay.io/kubevirt
+    -utility-container-prefix=quay.io/kubevirt \
+    -test.timeout=2h
