@@ -18,7 +18,7 @@ function get_auths() {
 }
 
 authfile=/tmp/authfile
-trap 'rm -rf /tmp/authfile*' EXIT SIGINT SIGTERM
+trap 'rm -rf /tmp/authfile*' SIGINT SIGTERM
 
 echo "getting authfile from cluster"
 oc get secret/pull-secret -n openshift-config -o json | jq -r '.data.".dockerconfigjson"' | base64 -d >"$authfile"
