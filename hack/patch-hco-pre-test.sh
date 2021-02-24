@@ -2,7 +2,7 @@
 
 if [[ "${KUBEVIRT_RELEASE}" =~ 0.34 ]]; then
     echo "Skipping scaling down the hco-operator pod due to older version"
-    return
+    exit 0
 fi
 
 set -euxo pipefail
