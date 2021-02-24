@@ -85,7 +85,7 @@ $SCRIPT_DIR/retry.sh 60 10 "oc get subscription kubevirt-hyperconverged -n $TARG
 # this will be resolved in kubectl v1.21: https://github.com/kubernetes/kubernetes/pull/96702
 # till then, we manually test for 404 in the output string (both with v1.20 and pre-v.120 formats)
 echo "waiting for the previous CSV to be completely removed"
-WAIT_CSV_OUTPUT=$(oc wait ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE --for delete --timeout=10m 2>&1)
+WAIT_CSV_OUTPUT=$(oc wait ClusterServiceVersion $OLD_CSV -n $TARGET_NAMESPACE --for delete --timeout=20m 2>&1)
 if [ $? -ne 0 ] && ! grep -qE "NotFound|(no matching resources found)" <(echo "$WAIT_CSV_OUTPUT"); then
   echo "$WAIT_CSV_OUTPUT"
   exit 1
