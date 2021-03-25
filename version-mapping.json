@@ -1,7 +1,7 @@
 {
   "4.6": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:59974",
-    "bundle_version": "v2.5.5-174"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:60128",
+    "bundle_version": "v2.5.5-176"
   },
   "4.7": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:48477",
