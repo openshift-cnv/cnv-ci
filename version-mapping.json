@@ -8,7 +8,7 @@
     "bundle_version": "v4.8.0-119"
   },
   "4.8": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:61870",
-    "bundle_version": "v4.8.0-209"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:61874",
+    "bundle_version": "v4.8.0-210"
   }
 }
