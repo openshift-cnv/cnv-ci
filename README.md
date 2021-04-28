@@ -82,7 +82,7 @@ $ cat version-mapping.json
   },
   "4.7": {
     "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:29330",
-    "bundle_version": "v2.6.0-306"
+    "bundle_version": "v2.6.0-307"
   }
 }
 ```
