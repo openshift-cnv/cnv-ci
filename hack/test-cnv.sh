@@ -15,6 +15,8 @@ if [[ ${KUBEVIRT_TAG} == *"rc"* ]]; then
   fi
 fi
 
+trap 'rm -rf /tmp/authfile*' EXIT SIGINT SIGTERM
+
 echo "Kubevirt release in use is: ${KUBEVIRT_RELEASE}"
 
 echo "downloading the test binary"
