@@ -34,6 +34,14 @@ echo "waiting for testing infrastructure to be ready"
 oc wait deployment cdi-http-import-server -n "${TARGET_NAMESPACE}" --for condition=Available --timeout=10m
 oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=10m
 
+skip_tests+=('\[QUARANTINE]')
+skip_tests+=('test_id:4659') # "VirtualMachine VM rename VM update" test no longer works, due to KMP issue.
+
+skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
+skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
+
+
+
 echo "starting tests"
 ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
@@ -50,4 +58,5 @@ ${TESTS_BINARY} \
     -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
-    -test.timeout=2h
+    -test.timeout=2h \
+    "${skip_arg}"
