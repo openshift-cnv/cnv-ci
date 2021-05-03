@@ -36,6 +36,21 @@ oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --f
 
 skip_tests+=('\[QUARANTINE]')
 skip_tests+=('test_id:4659') # "VirtualMachine VM rename VM update" test no longer works, due to KMP issue.
+skip_tests+=('Slirp Networking')
+skip_tests+=('with CPU spec')
+skip_tests+=('with TX offload disabled')
+skip_tests+=('with cni flannel and ptp plugin interface')
+skip_tests+=('with ovs-cni plugin')
+skip_tests+=('SRIOV')
+skip_tests+=('with EFI')
+skip_tests+=('Operator')
+skip_tests+=('GPU')
+skip_tests+=('DataVolume Integration')
+skip_tests+=('test_id:3468')
+skip_tests+=('test_id:3466')
+skip_tests+=('test_id:1015')
+skip_tests+=('rfe_id:393')
+skip_tests+=('test_id:4659')
 
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
@@ -52,7 +67,6 @@ ${TESTS_BINARY} \
     -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
     -ginkgo.noColor \
     -ginkgo.seed=0 \
-    -ginkgo.skip='(Slirp Networking)|(with CPU spec)|(with TX offload disabled)|(with cni flannel and ptp plugin interface)|(with ovs-cni plugin)|(test_id:1752)|(SRIOV)|(with EFI)|(Operator)|(GPU)|(DataVolume Integration)|(test_id:3468)|(test_id:3466)|(test_id:1015)|(rfe_id:393)' \
     -ginkgo.slowSpecThreshold=60 \
     -ginkgo.succinct \
     -oc-path="$(which oc)" \
