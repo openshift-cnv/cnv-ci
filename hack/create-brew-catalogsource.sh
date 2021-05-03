@@ -18,7 +18,7 @@ spec:
   publisher: grpc
 EOF
 
-while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --no-headers | wc -l)" -eq 0 ]; do
+while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --no-headers | wc -l)" -ne 1 ]; do
     echo "waiting for catalog source pod to be created"
     sleep 5
 done
