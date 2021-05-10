@@ -35,7 +35,6 @@ oc wait deployment cdi-http-import-server -n "${TARGET_NAMESPACE}" --for conditi
 oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=10m
 
 skip_tests+=('\[QUARANTINE]')
-skip_tests+=('test_id:4659') # "VirtualMachine VM rename VM update" test no longer works, due to KMP issue.
 skip_tests+=('Slirp Networking')
 skip_tests+=('with CPU spec')
 skip_tests+=('with TX offload disabled')
@@ -51,6 +50,17 @@ skip_tests+=('test_id:3466')
 skip_tests+=('test_id:1015')
 skip_tests+=('rfe_id:393')
 skip_tests+=('test_id:4659')
+
+# Skipping VM Rename tests, which are failing due to a bug in KMP.
+skip_tests+=('test_id:4646')
+skip_tests+=('test_id:4647')
+skip_tests+=('test_id:4654')
+skip_tests+=('test_id:4655')
+skip_tests+=('test_id:4656')
+skip_tests+=('test_id:4657')
+skip_tests+=('test_id:4658')
+skip_tests+=('test_id:4659')
+
 
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
