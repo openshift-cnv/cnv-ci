@@ -17,12 +17,16 @@ echo "waiting for testing infrastructure to be ready"
 oc wait deployment cdi-http-import-server -n "${TARGET_NAMESPACE}" --for condition=Available --timeout=10m
 oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=10m
 
+mkdir -p "$ARTIFACT_DIR"
+# required to be set for test binary: https://github.com/kubevirt/kubevirt/blob/73028535184edb187744e7ad9493d37d70b1d8d4/tests/flags/flags.go#L71
+export ARTIFACTS=${ARTIFACT_DIR}
+
 echo "starting tests"
 ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
     -config=./manifests/testing/kubevirt-testing-configuration.json \
     -installed-namespace="$TARGET_NAMESPACE" \
-    -junit-output="${ARTIFACTS_DIR}/junit.functest.xml" \
+    -junit-output="${ARTIFACTS}/junit.functest.xml" \
     -kubeconfig="$KUBECONFIG" \
     -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
     -ginkgo.noColor \
