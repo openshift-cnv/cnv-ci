@@ -66,7 +66,7 @@ skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
 
 
-mkdir -p "${ARTIFACTS_DIR"}
+mkdir -p "${ARTIFACTS_DIR}"
 
 echo "starting tests"
 ${TESTS_BINARY} \
