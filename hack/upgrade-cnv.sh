@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+VMS_NAMESPACE=vmsns
+
 function cleanup() {
     rv=$?
     if [ "x$rv" != "x0" ]; then
@@ -67,6 +69,30 @@ EOF
 echo "waiting for HyperConverged operator to become ready"
 $SCRIPT_DIR/wait-for-hco.sh
 
+
+echo "----- Get virtctl"
+
+# TODO: avoid fetching the upstream virtctl once the downstream one will
+# be packaged for the disconnected use case
+OPERATOR_VERSION=$(oc get kubevirt.kubevirt.io/kubevirt-kubevirt-hyperconverged -n ${TARGET_NAMESPACE} -o=jsonpath="{.status.operatorVersion}")
+UPSTREAM_KV_VERSION=${OPERATOR_VERSION%%-*}
+ARCH=$(uname -s | tr A-Z a-z)-$(uname -m | sed 's/x86_64/amd64/') || windows-amd64.exe
+echo ${ARCH}
+curl -L -o ~/virtctl https://github.com/kubevirt/kubevirt/releases/download/${UPSTREAM_KV_VERSION}/virtctl-${UPSTREAM_KV_VERSION}-${ARCH}
+chmod +x ~/virtctl
+
+
+echo "----- Create a simple VM on the previous version cluster, before the upgrade"
+oc create namespace ${VMS_NAMESPACE}
+oc apply -n ${VMS_NAMESPACE} -f ./hack/vm.yaml
+oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
+~/virtctl start testvm -n ${VMS_NAMESPACE}
+$SCRIPT_DIR/retry.sh 30 10 "oc get vmi -n ${VMS_NAMESPACE} testvm -o jsonpath='{ .status.phase }' | grep 'Running'"
+oc get vmi -n ${VMS_NAMESPACE} -o yaml testvm
+
+# TODO: only when expect will be available in the test image
+#INITIAL_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
+
 #=======================================
 # Upgrade HCO to latest build from brew
 #=======================================
@@ -103,6 +129,25 @@ if [ $? -ne 0 ] && ! grep -qE "NotFound|(no matching resources found)" <(echo "$
   exit 1
 fi
 echo "$WAIT_CSV_OUTPUT"
+
+echo "----- Make sure that the VM is still running, after the upgrade"
+oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
+oc get vmi -n ${VMS_NAMESPACE} -o yaml testvm
+oc get vmi -n ${VMS_NAMESPACE} testvm -o jsonpath='{ .status.phase }' | grep 'Running'
+
+# TODO: only when expect will be available in the test image
+#CURRENT_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
+#
+#if ((INITIAL_BOOTTIME - CURRENT_BOOTTIME > 3)) || ((CURRENT_BOOTTIME - INITIAL_BOOTTIME > 3)); then
+#    echo "ERROR: The test VM got restarted during the upgrade process."
+#    exit 1
+#else
+#    echo "The test VM survived the upgrade process."
+#fi
+
+~/virtctl stop testvm -n ${VMS_NAMESPACE}
+oc delete vm -n ${VMS_NAMESPACE} testvm
+oc delete ns ${VMS_NAMESPACE}
 
 # The previous CSV get deleted with "background deletion" propagation
 # policy, i.e. before its owned resources are completely removed.
