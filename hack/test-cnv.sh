@@ -61,6 +61,9 @@ skip_tests+=('test_id:4657')
 skip_tests+=('test_id:4658')
 skip_tests+=('test_id:4659')
 
+# Skipping "Delete a VirtualMachineInstance with ACPI and 0 grace period seconds" due to a bug
+skip_tests+=('test_id:1652')
+
 
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
