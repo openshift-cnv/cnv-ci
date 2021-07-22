@@ -23,5 +23,22 @@ while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-cat
     sleep 5
 done
 
-echo "waiting for catalog source pod to be ready"
-oc wait pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --for condition=Ready --timeout=180s
+echo "waiting for the brew catalog source to become ready"
+CATALOG_SOURCE_READY=false
+for i in $(seq 1 60); do
+  if [ "$(oc get catsrc brew-catalog-source -n "openshift-marketplace" -o jsonpath='{.status.connectionState.lastObservedState}')" == "READY" ]
+  then
+    CATALOG_SOURCE_READY=true
+    echo "the brew catalog source is ready."
+    break
+  else
+    echo "Retry #$i"
+    sleep 5
+  fi
+done
+
+if [ ${CATALOG_SOURCE_READY} != "true" ]
+then
+  echo "Timeout when waiting the catalog source to become ready. Job aborted."
+  exit 1
+fi
