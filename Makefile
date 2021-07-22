@@ -30,3 +30,6 @@ test_cnv:
 
 quicklab:
 	hack/quicklab.sh
+
+dump-state:
+	./hack/dump-state.sh
