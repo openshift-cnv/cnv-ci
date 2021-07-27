@@ -90,8 +90,7 @@ oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
 $SCRIPT_DIR/retry.sh 30 10 "oc get vmi -n ${VMS_NAMESPACE} testvm -o jsonpath='{ .status.phase }' | grep 'Running'"
 oc get vmi -n ${VMS_NAMESPACE} -o yaml testvm
 
-# TODO: only when expect will be available in the test image
-#INITIAL_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
+INITIAL_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
 
 #=======================================
 # Upgrade HCO to latest build from brew
@@ -135,15 +134,14 @@ oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
 oc get vmi -n ${VMS_NAMESPACE} -o yaml testvm
 oc get vmi -n ${VMS_NAMESPACE} testvm -o jsonpath='{ .status.phase }' | grep 'Running'
 
-# TODO: only when expect will be available in the test image
-#CURRENT_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
-#
-#if ((INITIAL_BOOTTIME - CURRENT_BOOTTIME > 3)) || ((CURRENT_BOOTTIME - INITIAL_BOOTTIME > 3)); then
-#    echo "ERROR: The test VM got restarted during the upgrade process."
-#    exit 1
-#else
-#    echo "The test VM survived the upgrade process."
-#fi
+CURRENT_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
+
+if ((INITIAL_BOOTTIME - CURRENT_BOOTTIME > 3)) || ((CURRENT_BOOTTIME - INITIAL_BOOTTIME > 3)); then
+    echo "ERROR: The test VM got restarted during the upgrade process."
+    exit 1
+else
+    echo "The test VM survived the upgrade process."
+fi
 
 ~/virtctl stop testvm -n ${VMS_NAMESPACE}
 oc delete vm -n ${VMS_NAMESPACE} testvm
