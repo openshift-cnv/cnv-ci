@@ -69,14 +69,14 @@ skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
 
 
-mkdir -p "${ARTIFACTS_DIR}"
+mkdir -p "${ARTIFACT_DIR}"
 
 echo "starting tests"
 ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
     -config=./manifests/testing/kubevirt-testing-configuration.json \
     -installed-namespace="$TARGET_NAMESPACE" \
-    -junit-output="${ARTIFACTS_DIR}/junit.functest.xml" \
+    -junit-output="${ARTIFACT_DIR}/junit.functest.xml" \
     -kubeconfig="$KUBECONFIG" \
     -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
     -ginkgo.noColor \
