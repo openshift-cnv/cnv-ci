@@ -45,7 +45,7 @@ done
 
 tmp_version_mapping_file=$(mktemp "/tmp/$original_input_file.XXXXXXXXX")
 
-jq '. + '"$(jq -r '{ (.index.ocp_version | ltrimstr("v")): { "index_image": .index.index_image, "bundle_version": (.index.added_bundle_images[] | select(. | contains("hco-bundle-registry")) | split(":") | .[1] ) } }' "$message_file")" "$original_input_file" >"$tmp_version_mapping_file"
+jq '. + '"$(jq -r '{ (.artifact.nvr | split("-")[-2] | split(".")[0:2] | join(".") | ltrimstr("v")): { "index_image": .index.index_image, "bundle_version": (.index.added_bundle_images[] | select(. | contains("hco-bundle-registry")) | split(":") | .[1] ) } }' "$message_file")" "$original_input_file" >"$tmp_version_mapping_file"
 
 rm -f "$original_input_file"
 mv "$tmp_version_mapping_file" "$original_input_file"
