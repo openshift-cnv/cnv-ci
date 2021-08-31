@@ -1,5 +1,5 @@
 FROM src
 
-RUN yum install -y expect
+RUN yum install -y expect sqlite-3
 COPY oc /usr/bin/oc
 
