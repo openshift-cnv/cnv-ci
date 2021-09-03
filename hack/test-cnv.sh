@@ -64,7 +64,7 @@ skip_tests+=('test_id:4659')
 # Skipping "Delete a VirtualMachineInstance with ACPI and 0 grace period seconds" due to a bug
 skip_tests+=('test_id:1652')
 
-if [ "$PRODUCTION_RELEASE" == "true" ]; then
+if [ "$PRODUCTION_RELEASE" = "true" ]; then
   # Skipping flaky test for OCP Informing Jobs.
   skip_tests+=('test_id:1530')
 fi
