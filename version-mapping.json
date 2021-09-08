@@ -12,7 +12,7 @@
     "bundle_version": "v4.8.2-8"
   },
   "4.9": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:107128",
-    "bundle_version": "v4.9.0-184"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:107229",
+    "bundle_version": "v4.9.0-185"
   }
 }
