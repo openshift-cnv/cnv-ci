@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
+
 echo "get matching kubevirt release from the build"
 VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].image}' |
   sed 's|registry.redhat.io/container-native-virtualization/|brew.registry.redhat.io/rh-osbs/container-native-virtualization-|')
