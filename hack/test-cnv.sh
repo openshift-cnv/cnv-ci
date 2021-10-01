@@ -5,8 +5,12 @@ set -euxo pipefail
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
 
 echo "get matching kubevirt release from the build"
-VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].image}' |
-  sed 's|registry.redhat.io/container-native-virtualization/|brew.registry.redhat.io/rh-osbs/container-native-virtualization-|')
+VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].image}')
+
+if [ "$PRODUCTION_RELEASE" = "false" ]; then
+  # In case of a pre-release build, use the brew registry for the virt-operator image pullspec
+  VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE//registry.redhat.io\/container-native-virtualization\//brew.registry.redhat.io\/rh-osbs\/container-native-virtualization-}
+fi
 KUBEVIRT_TAG=$(oc image info -a /tmp/authfile.new ${VIRT_OPERATOR_IMAGE} -o json | jq '.config.config.Labels["upstream-version"]')
 KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1}' | tr -d '"')
 if [[ ${KUBEVIRT_TAG} == *"rc"* ]]; then
@@ -65,6 +69,11 @@ skip_tests+=('test_id:4659')
 
 # Skipping "Delete a VirtualMachineInstance with ACPI and 0 grace period seconds" due to a bug
 skip_tests+=('test_id:1652')
+
+if [ "$PRODUCTION_RELEASE" = "true" ]; then
+  # Skipping flaky test for OCP Informing Jobs.
+  skip_tests+=('test_id:1530')
+fi
 
 
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
