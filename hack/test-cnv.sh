@@ -93,4 +93,5 @@ ${TESTS_BINARY} \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
     -test.timeout=2h \
+    -ginkgo.flakeAttempts=3 \
     "${skip_arg}"
