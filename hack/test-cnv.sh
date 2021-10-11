@@ -38,7 +38,7 @@ echo "create testing infrastructure"
 
 echo "waiting for testing infrastructure to be ready"
 oc wait deployment cdi-http-import-server -n "${TARGET_NAMESPACE}" --for condition=Available --timeout=10m
-oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=10m
+oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=20m
 
 skip_tests+=('\[QUARANTINE]')
 skip_tests+=('Slirp Networking')
