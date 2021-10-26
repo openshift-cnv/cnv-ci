@@ -117,7 +117,7 @@ chmod +x ~/virtctl
 
 echo "----- Create a simple VM on the previous version cluster, before the upgrade"
 oc create namespace ${VMS_NAMESPACE}
-"$SCRIPT_DIR"/retry.sh 30 10 oc apply -n ${VMS_NAMESPACE} -f ./hack/vm.yaml
+"$SCRIPT_DIR"/retry.sh 30 10 "oc apply -n ${VMS_NAMESPACE} -f ./hack/vm.yaml"
 oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
 ~/virtctl start testvm -n ${VMS_NAMESPACE}
 "$SCRIPT_DIR"/retry.sh 30 10 "oc get vmi -n ${VMS_NAMESPACE} testvm -o jsonpath='{ .status.phase }' | grep 'Running'"
