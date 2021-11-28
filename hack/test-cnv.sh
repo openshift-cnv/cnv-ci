@@ -17,6 +17,9 @@ if [[ ${KUBEVIRT_TAG} == *"rc"* ]]; then
   fi
 fi
 
+# TEMPORARY HACK UNTIL KUBEVIRT v0.36.4 WILL BE RELEASED IN GITHUB
+KUBEVIRT_RELEASE=v0.36.3
+
 trap 'rm -rf /tmp/authfile*' EXIT SIGINT SIGTERM
 
 echo "Kubevirt release in use is: ${KUBEVIRT_RELEASE}"
