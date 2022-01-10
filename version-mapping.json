@@ -20,7 +20,7 @@
     "bundle_version": "v4.10.0-195"
   },
   "2.6": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:156828",
-    "bundle_version": "v2.6.9-39"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:157618",
+    "bundle_version": "v2.6.9-40"
   }
 }
