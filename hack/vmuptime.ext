@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
-# Wait enough (forever) until a long-time boot
-set timeout -1
+# Wait 60 seconds to get the boot time output from the VM
+set timeout 60
 
 # Start the guest VM
 spawn ~/virtctl console testvm -n vmsns
