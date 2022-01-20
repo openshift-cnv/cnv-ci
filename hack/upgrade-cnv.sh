@@ -123,7 +123,8 @@ oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
 "$SCRIPT_DIR"/retry.sh 30 10 "oc get vmi -n ${VMS_NAMESPACE} testvm -o jsonpath='{ .status.phase }' | grep 'Running'"
 oc get vmi -n ${VMS_NAMESPACE} -o yaml testvm
 
-INITIAL_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
+source ./hack/check-uptime.sh
+INITIAL_BOOTTIME=$(check_uptime 10 60)
 
 #=======================================
 # Upgrade HCO to latest build from brew
@@ -189,7 +190,7 @@ oc get vm -n "${VMS_NAMESPACE}" -o yaml testvm
 oc get vmi -n "${VMS_NAMESPACE}" -o yaml testvm
 oc get vmi -n "${VMS_NAMESPACE}" testvm -o jsonpath='{ .status.phase }' | grep 'Running'
 
-CURRENT_BOOTTIME=$(./hack/vmuptime.ext | grep "^BOOTTIME" | cut -d= -f2 | tr -dc '[:digit:]')
+CURRENT_BOOTTIME=$(check_uptime 10 60)
 
 if ((INITIAL_BOOTTIME - CURRENT_BOOTTIME > 3)) || ((CURRENT_BOOTTIME - INITIAL_BOOTTIME > 3)); then
     echo "ERROR: The test VM got restarted during the upgrade process."
