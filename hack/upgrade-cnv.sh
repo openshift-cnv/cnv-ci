@@ -111,12 +111,28 @@ OPERATOR_VERSION=$(oc get kubevirt.kubevirt.io/kubevirt-kubevirt-hyperconverged 
 UPSTREAM_KV_VERSION="${OPERATOR_VERSION%%-*}"
 ARCH=$(uname -s | tr "[:upper:]" "[:lower:]")-$(uname -m | sed 's/x86_64/amd64/') || windows-amd64.exe
 echo "${ARCH}"
+### TODO: remove this once we can consume only kubevirt >= v0.55.0
+# --local-ssh-opts needed to bypass host check is available only starting with kubevirt v0.55.0
+UPSTREAM_KV_VERSION=v0.55.0
+###
 curl -L -o ~/virtctl https://github.com/kubevirt/kubevirt/releases/download/"${UPSTREAM_KV_VERSION}"/virtctl-"${UPSTREAM_KV_VERSION}"-"${ARCH}"
 chmod +x ~/virtctl
 
 
 echo "----- Create a simple VM on the previous version cluster, before the upgrade"
 oc create namespace ${VMS_NAMESPACE}
+ssh-keygen -f ./hack/test_ssh -q -N ""
+cat << END > ./hack/cloud-init.sh
+#!/bin/sh
+export NEW_USER="cirros"
+export SSH_PUB_KEY="$(cat ./hack/test_ssh.pub)"
+sudo mkdir /home/\${NEW_USER}/.ssh
+sudo echo "\${SSH_PUB_KEY}" > /home/\${NEW_USER}/.ssh/authorized_keys
+sudo chown -R \${NEW_USER}: /home/\${NEW_USER}/.ssh
+sudo chmod 600 /home/\${NEW_USER}/.ssh/authorized_keys
+END
+
+oc create secret -n ${VMS_NAMESPACE} generic testvm-secret --from-file=userdata=./hack/cloud-init.sh
 oc apply -n ${VMS_NAMESPACE} -f ./hack/vm.yaml
 oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
 ~/virtctl start testvm -n ${VMS_NAMESPACE}
@@ -124,6 +140,7 @@ oc get vm -n ${VMS_NAMESPACE} -o yaml testvm
 oc get vmi -n ${VMS_NAMESPACE} -o yaml testvm
 
 source ./hack/check-uptime.sh
+sleep 5
 INITIAL_BOOTTIME=$(check_uptime 10 60)
 
 #=======================================

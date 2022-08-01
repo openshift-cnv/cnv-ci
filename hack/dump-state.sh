@@ -35,7 +35,23 @@ cat <<EOF
 =================================
      Start of HCO state dump         
 =================================
+EOF
 
+if [ -n "${ARTIFACT_DIR}" ]; then
+    cat <<EOF
+==============================
+executing cnv-must-gather
+==============================
+
+EOF
+    mkdir -p ${ARTIFACT_DIR}/cnv-must-gather
+    mkdir -p ${ARTIFACT_DIR}/cnv-must-gather-vms
+    CNV_MG_IMAGE=$(${CMD} get csv -n openshift-cnv -o json | jq -r '.items[0].spec.relatedImages[] | select (.name | contains("must-gather")) | .image')
+    RunCmd "${CMD} adm must-gather --image=${CNV_MG_IMAGE} --dest-dir=${ARTIFACT_DIR}/cnv-must-gather --timeout='30m'"
+    RunCmd "${CMD} adm must-gather --image=${CNV_MG_IMAGE} --dest-dir=${ARTIFACT_DIR}/cnv-must-gather-vms --timeout='30m' -- /usr/bin/gather_vms_details"
+fi
+
+cat <<EOF
 ==========================
 summary of operator status
 ==========================
