@@ -21,7 +21,18 @@ if [[ ${KUBEVIRT_TAG} == *"rc"* ]]; then
   fi
 fi
 
-trap 'rm -rf /tmp/authfile*' EXIT SIGINT SIGTERM
+function cleanup() {
+    rv=$?
+    if [ "x$rv" != "x0" ]; then
+        echo "Error during tests: exit status: $rv"
+        make dump-state
+        echo "*** CNV tests failed ***"
+    fi
+    rm -rf "/tmp/authfile*"
+    exit $rv
+}
+
+trap "cleanup" INT TERM EXIT
 
 echo "Kubevirt release in use is: ${KUBEVIRT_RELEASE}"
 
@@ -70,11 +81,28 @@ skip_tests+=('test_id:4659')
 # Skipping "Delete a VirtualMachineInstance with ACPI and 0 grace period seconds" due to a bug
 skip_tests+=('test_id:1652')
 
-if [ "$PRODUCTION_RELEASE" = "true" ]; then
-  # Skipping flaky test for OCP Informing Jobs.
-  skip_tests+=('test_id:1530')
-fi
-
+# Skipping a few unrealiable tests
+skip_tests+=('rfe_id:273')
+skip_tests+=('test_id:1615')
+skip_tests+=('test_id:1616')
+skip_tests+=('test_id:1617')
+skip_tests+=('test_id:1618')
+skip_tests+=('test_id:1626')
+skip_tests+=('test_id:1651')
+skip_tests+=('test_id:1657')
+skip_tests+=('test_id:2190')
+skip_tests+=('test_id:3178')
+skip_tests+=('test_id:3180')
+skip_tests+=('test_id:3182')
+skip_tests+=('test_id:3184')
+skip_tests+=('test_id:3185')
+skip_tests+=('test_id:3199')
+skip_tests+=('test_id:4119')
+skip_tests+=('test_id:4622')
+skip_tests+=('test_id:6993')
+skip_tests+=('test_id:7679')
+skip_tests+=('[Serial] Should leave a failed VMI')
+skip_tests+=('VirtualMachine crash loop backoff should backoff attempting to create a new VMI when')
 
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
@@ -93,10 +121,12 @@ ${TESTS_BINARY} \
     -ginkgo.noColor \
     -ginkgo.seed=0 \
     -ginkgo.slowSpecThreshold=60 \
-    -ginkgo.succinct \
+    -ginkgo.v \
+    -ginkgo.trace \
     -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
-    -test.timeout=2h \
+    -test.timeout=3h \
+    -test.v \
     -ginkgo.flakeAttempts=3 \
     "${skip_arg}"
