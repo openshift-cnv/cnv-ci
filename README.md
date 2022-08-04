@@ -2,6 +2,7 @@
 
 Contains the required files for running cnv builds on openshift-ci.
 
+
 # version mapping
 
 # How to create a json containing the required json from the UMB message:
