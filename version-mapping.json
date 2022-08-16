@@ -12,19 +12,19 @@
     "bundle_version": "v4.8.2-8"
   },
   "4.9": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:294341",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:294341",
     "bundle_version": "v4.9.6-30"
   },
   "4.10": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:292661",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:292661",
     "bundle_version": "v4.10.4-18"
   },
   "4.11": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:291997",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:291997",
     "bundle_version": "v4.11.0-593"
   },
   "4.12": {
-    "index_image": "registry-proxy.engineering.redhat.com/rh-osbs/iib:294294",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:294294",
     "bundle_version": "v4.12.0-378"
   }
 }
