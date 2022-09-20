@@ -21,6 +21,14 @@ echo "OCP_VERSION: $OCP_VERSION"
 
 oc create ns "${TARGET_NAMESPACE}"
 
+# add pod security admission labels
+oc label namespace "${TARGET_NAMESPACE}" pod-security.kubernetes.io/enforce=privileged
+oc label namespace "${TARGET_NAMESPACE}" pod-security.kubernetes.io/audit=privileged
+oc label namespace "${TARGET_NAMESPACE}" pod-security.kubernetes.io/warn=privileged
+# shouldn't be needed for openshift- prefixed namespaces but add in case TARGET_NAMESPACE is non openshift- prefix
+oc label namespace "${TARGET_NAMESPACE}" security.openshift.io/scc.podSecurityLabelSync=false
+
+
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
     echo "creating subscription"
     oc create -f - <<EOF
