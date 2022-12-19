@@ -10,13 +10,18 @@ VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o 
 if [ "$PRODUCTION_RELEASE" = "false" ]; then
   # In case of a pre-release build, use the brew registry for the virt-operator image pullspec
   VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE//registry.redhat.io\/container-native-virtualization\//brew.registry.redhat.io\/rh-osbs\/container-native-virtualization-}
+  MACHINETYPE=$(oc get kv kubevirt-kubevirt-hyperconverged -o jsonpath='{.spec.configuration.machineType}')
+  if [[ "$MACHINETYPE" == *"rhel9"* ]]
+  then
+    VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE/virt-operator/virt-operator-rhel9}
+  fi
 fi
 KUBEVIRT_TAG=$(oc image info -a /tmp/authfile.new ${VIRT_OPERATOR_IMAGE} -o json | jq '.config.config.Labels["upstream-version"]')
 KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1}' | tr -d '"')
-if [[ ${KUBEVIRT_TAG} == *"rc"* ]]; then
+if [[ ${KUBEVIRT_TAG} == *"rc"* ]] || [[ ${KUBEVIRT_TAG} == *"alpha"* ]]; then
   KUBEVIRT_TESTS_URL=https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_RELEASE}/tests.test
   if ! curl --output /dev/null --silent --head --fail "${KUBEVIRT_TESTS_URL}"; then
-    # First checking if the official release exists (without "rc"). If not - use the release candidate version.
+    # First checking if the official release exists (without "rc" or "alpha"). If not - use the release candidate version.
     KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1"-"$2}' | tr -d '"')
   fi
 fi
