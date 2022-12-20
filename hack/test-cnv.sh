@@ -10,7 +10,7 @@ VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o 
 if [ "$PRODUCTION_RELEASE" = "false" ]; then
   # In case of a pre-release build, use the brew registry for the virt-operator image pullspec
   VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE//registry.redhat.io\/container-native-virtualization\//brew.registry.redhat.io\/rh-osbs\/container-native-virtualization-}
-  MACHINETYPE=$(oc get kv kubevirt-kubevirt-hyperconverged -o jsonpath='{.spec.configuration.machineType}')
+  MACHINETYPE=$(oc get kv kubevirt-kubevirt-hyperconverged -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.configuration.machineType}')
   if [[ "$MACHINETYPE" == *"rhel9"* ]]
   then
     VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE/virt-operator/virt-operator-rhel9}
