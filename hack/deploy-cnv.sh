@@ -52,6 +52,7 @@ else
     "$SCRIPT_DIR"/create-brew-catalogsource.sh
 
     STARTING_CSV=${bundle_version%-*}
+    STARTING_CSV=${STARTING_CSV/.rhel9/}
     echo "creating subscription"
     oc create -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
