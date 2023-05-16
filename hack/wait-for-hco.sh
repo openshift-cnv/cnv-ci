@@ -4,11 +4,6 @@ set -euxo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-# TEMP HACK TO UNLOCK UPGRADE
-for OLM_APP_LABEL in olm-operator catalog-operator; do
-  oc delete -n openshift-operator-lifecycle-manager "$(oc get pod -n openshift-operator-lifecycle-manager -l app=${OLM_APP_LABEL} -o name)"
-done
-
 echo "waiting for hco-operator deployment to be created"
 $SCRIPT_DIR/retry.sh 30 10 "oc get deployment hco-operator -n $TARGET_NAMESPACE"
 
