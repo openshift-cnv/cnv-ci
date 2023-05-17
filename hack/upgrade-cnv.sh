@@ -37,7 +37,19 @@ else
     echo "Using index_image: $index_image"
     # shellcheck disable=SC2154
     echo "Using bundle_version: $bundle_version"
-    STARTINGCSV=""
+    oc image extract -a /tmp/authfile.new $index_image --confirm --path configs/kubevirt-hyperconverged/catalog.json:. --path database/index.db:.
+    NEW_CSV_VERSION=${bundle_version%-*}
+    NEW_CSV_VERSION=${NEW_CSV_VERSION/.rhel9/}
+    NEW_CSV="kubevirt-hyperconverged-operator.${NEW_CSV_VERSION}"
+    if [[ -f "catalog.json" ]]; then
+      echo "FBC based Index Image"
+      OLD_CSV=$(cat catalog.json | jq -r ". | select(.schema==\"olm.channel\" and .name==\"stable\") | .entries[] | select(.name==\"${NEW_CSV}\").replaces")
+    else
+      echo "DB based Index Image"
+      OLD_CSV=$(sqlite3 -list index.db "select operatorbundle.replaces from operatorbundle where operatorbundle.name=\"${NEW_CSV}\";")
+    fi
+    STARTINGCSV="  startingCSV: ${OLD_CSV}"
+    echo "Upgrading from ${OLD_CSV} to ${NEW_CSV}"
 fi
 
 #===================
@@ -61,8 +73,14 @@ EOF
 
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
     echo "installing kubevirt-hyperconverged using the version replaced by the head of the stable channel: ${OLD_CSV}"
+    INITIALSOURCE=${PRODSOURCE}
 else
-    echo "installing kubevirt-hyperconverged using the head of the stable channel"
+    echo "installing ${OLD_CSV} from brew registry"
+    
+    echo "setting up brew catalog source"
+    "$SCRIPT_DIR"/create-brew-catalogsource.sh
+
+    INITIALSOURCE=brew-catalog-source
 fi
 
 echo "creating subscription"
@@ -78,7 +96,7 @@ spec:
   channel: stable
   installPlanApproval: Manual
   name: kubevirt-hyperconverged
-  source: ${PRODSOURCE}
+  source: ${INITIALSOURCE}
   sourceNamespace: openshift-marketplace
 ${STARTINGCSV}
 EOF
@@ -99,6 +117,8 @@ done
 
 [[ "${INSTALL_PLAN_APPROVED}" = true ]]
 
+echo "check the package manifest"
+oc describe packagemanifest kubevirt-hyperconverged || true
 
 echo "waiting for HyperConverged operator to become ready"
 "$SCRIPT_DIR"/wait-for-hco.sh
@@ -113,7 +133,10 @@ ARCH=$(uname -s | tr "[:upper:]" "[:lower:]")-$(uname -m | sed 's/x86_64/amd64/'
 echo "${ARCH}"
 ### TODO: remove this once we can consume only kubevirt >= v0.55.0
 # --local-ssh-opts needed to bypass host check is available only starting with kubevirt v0.55.0
-UPSTREAM_KV_VERSION=v0.55.0
+if [[ "$OCP_VERSION" == "4.10" || "$OCP_VERSION" == "4.11" ]];
+then
+   UPSTREAM_KV_VERSION=v0.55.0
+fi
 ###
 curl -L -o ~/virtctl https://github.com/kubevirt/kubevirt/releases/download/"${UPSTREAM_KV_VERSION}"/virtctl-"${UPSTREAM_KV_VERSION}"-"${ARCH}"
 chmod +x ~/virtctl
@@ -147,28 +170,13 @@ INITIAL_BOOTTIME=$(check_uptime 10 60)
 # Upgrade HCO to latest build from brew
 #=======================================
 
-OLD_CSV=$(oc get subscription kubevirt-hyperconverged -n "$TARGET_NAMESPACE" -o jsonpath="{.status.installedCSV}")
-
 echo "waiting for the previous CSV installation to complete"
 "$SCRIPT_DIR"/retry.sh 60 10 "oc get ClusterServiceVersion $OLD_CSV -n \"$TARGET_NAMESPACE\" -o jsonpath='{.status.phase}' | grep 'Succeeded'"
 
 OLD_INSTALL_PLAN=$(oc get installplan -n "${TARGET_NAMESPACE}" | grep "${OLD_CSV}" | cut -d" " -f1)
+NEW_INSTALL_PLAN=$(oc get installplan -n "${TARGET_NAMESPACE}" | grep "${NEW_CSV}" | cut -d" " -f1)
 
-if [ "$PRODUCTION_RELEASE" = "true" ]; then
-    oc get -n "${TARGET_NAMESPACE}" installplans
-else
-    echo "setting up brew catalog source"
-    "$SCRIPT_DIR"/create-brew-catalogsource.sh
-
-    echo "patching the subscription to switch to the brew catalog source"
-    oc patch subscription kubevirt-hyperconverged -n "$TARGET_NAMESPACE" --type=merge --patch='{"spec": {"source": "brew-catalog-source"}}'
-
-    echo "waiting for the subscription's currentCSV to move to the new catalog source"
-    "$SCRIPT_DIR"/retry.sh 30 10 "oc get subscription kubevirt-hyperconverged -n \"$TARGET_NAMESPACE\" -o jsonpath='{.status.currentCSV}' | grep -v $OLD_CSV"
-
-    NEW_CSV=$(oc get subscription kubevirt-hyperconverged -n "$TARGET_NAMESPACE" -o jsonpath='{.status.currentCSV}')
-fi
-
+oc get -n "${TARGET_NAMESPACE}" installplans
 
 echo "Wait up to 5 minutes for the new installPlan to appear, and approve it to begin upgrade"
 INSTALL_PLAN_APPROVED=false
