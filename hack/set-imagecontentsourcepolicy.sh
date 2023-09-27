@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 echo "creating imageContentSourcePolicy"
-oc create -f - <<EOF
+oc apply -f - <<EOF
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageContentSourcePolicy
 metadata:
