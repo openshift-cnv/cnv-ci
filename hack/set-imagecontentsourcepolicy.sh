@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-echo "creating imageContentSourcePolicy"
+echo "applying imageContentSourcePolicy"
 oc apply -f - <<EOF
 apiVersion: operator.openshift.io/v1alpha1
 kind: ImageContentSourcePolicy
