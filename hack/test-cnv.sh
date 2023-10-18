@@ -147,30 +147,24 @@ else
 fi
 
 
-if [[ "$OCP_VERSION" != "4.14" ]];
-then
-  echo "starting tests"
-  ${TESTS_BINARY} \
-      -cdi-namespace="$TARGET_NAMESPACE" \
-      -config=./manifests/testing/kubevirt-testing-configuration.json \
-      -installed-namespace="$TARGET_NAMESPACE" \
-      -junit-output="${ARTIFACT_DIR}/junit.functest.xml" \
-      -kubeconfig="$KUBECONFIG" \
-      -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
-      "${GINKGO_NOCOLOR}" \
-      -ginkgo.seed=0 \
-      "${GINKGO_SLOW}" \
-      -ginkgo.v \
-      -ginkgo.trace \
-      -oc-path="$(which oc)" \
-      -kubectl-path="$(which oc)" \
-      -utility-container-prefix=quay.io/kubevirt \
-      -test.timeout=3h \
-      -test.v \
-      "${GINKGO_FLAKE}" \
-      "${skip_arg}"
-else
-  # TODO: please remove this once we wiil be able to
-  # consume a fix for https://github.com/kubevirt/kubevirt/issues/9725
-  echo "skipping tier1 tests on CNV 4.14"
-fi
+echo "Starting tests 🧪"
+${TESTS_BINARY} \
+    -cdi-namespace="$TARGET_NAMESPACE" \
+    -config=./manifests/testing/kubevirt-testing-configuration.json \
+    -installed-namespace="$TARGET_NAMESPACE" \
+    -junit-output="${ARTIFACT_DIR}/junit.functest.xml" \
+    -kubeconfig="$KUBECONFIG" \
+    -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
+    "${GINKGO_NOCOLOR}" \
+    -ginkgo.seed=0 \
+    "${GINKGO_SLOW}" \
+    -ginkgo.v \
+    -ginkgo.trace \
+    -oc-path="$(which oc)" \
+    -kubectl-path="$(which oc)" \
+    -utility-container-prefix=quay.io/kubevirt \
+    -test.timeout=3h \
+    -test.v \
+    "${GINKGO_FLAKE}" \
+    "${skip_arg}"
+
