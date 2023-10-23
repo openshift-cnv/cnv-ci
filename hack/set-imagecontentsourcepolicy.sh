@@ -22,7 +22,7 @@ spec:
 EOF
 
 echo "waiting for update to start"
-oc wait mcp --all --for condition=updating --timeout=5m
+oc wait mcp --all --for condition=updating --timeout=15m
 
 counter=3
 set +e
