@@ -28,15 +28,15 @@
     "bundle_version": "v4.12.8-17"
   },
   "4.13": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:606961",
-    "bundle_version": "v4.13.5.rhel9-281"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:607049",
+    "bundle_version": "v4.13.5.rhel9-282"
   },
   "4.14": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:606994",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:607000",
     "bundle_version": "v4.14.0.rhel9-2316"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:606998",
-    "bundle_version": "v4.15.0.rhel9-1441"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:607071",
+    "bundle_version": "v4.15.0.rhel9-1443"
   }
 }
