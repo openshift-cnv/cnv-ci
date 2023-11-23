@@ -32,11 +32,11 @@
     "bundle_version": "v4.13.6.rhel9-123"
   },
   "4.14": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:627794",
-    "bundle_version": "v4.14.1.rhel9-81"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:627845",
+    "bundle_version": "v4.14.1.rhel9-82"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:627821",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:627823",
     "bundle_version": "v4.15.0.rhel9-1769"
   },
   "4.16": {
