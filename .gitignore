@@ -1,3 +1,4 @@
+.idea/
 .vscode/*
 hack/cloud-init.sh
 hack/test_ssh*
