@@ -3,6 +3,7 @@
 set -euxo pipefail
 
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
+KUBEVIRT_TESTING_CONFIGURATION_FILE=${KUBEVIRT_TESTING_CONFIGURATION_FILE:-'kubevirt-testing-configuration.json'}
 
 echo "get matching kubevirt release from the build"
 VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].image}')
@@ -137,7 +138,7 @@ fi
 echo "Starting tests 🧪"
 ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
-    -config=./manifests/testing/kubevirt-testing-configuration.json \
+    -config="./manifests/testing/${KUBEVIRT_TESTING_CONFIGURATION_FILE}" \
     -installed-namespace="$TARGET_NAMESPACE" \
     -junit-output="${ARTIFACT_DIR}/junit.functest.xml" \
     -kubeconfig="$KUBECONFIG" \
