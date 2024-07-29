@@ -41,20 +41,7 @@ BIN_DIR="$(pwd)/_out" && mkdir -p "${BIN_DIR}"
 export BIN_DIR
 
 TESTS_BINARY="$BIN_DIR/tests.test"
-######
-# hack to run a fixed version of Kubevirt tests
-# please remove this hack once
-# - https://github.com/kubevirt/kubevirt/pull/9683
-# - https://github.com/kubevirt/kubevirt/pull/9684
-# are properly consumed
-#curl -Lo "$TESTS_BINARY" "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_RELEASE}/tests.test"
-if [[ "$KUBEVIRT_RELEASE" == "v1.0.0-alpha.0" ]]; then
-    echo "Using a fixed version of kubevirt tests"
-    curl -Lo "$TESTS_BINARY" "https://github.com/tiraboschi/kubevirt/releases/download/v1.0.0-alpha.0-fix/tests.test"
-else
-    curl -Lo "$TESTS_BINARY" "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_RELEASE}/tests.test"
-fi
-######
+curl -Lo "$TESTS_BINARY" "https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_RELEASE}/tests.test"
 chmod +x "$TESTS_BINARY"
 
 echo "create testing infrastructure"
@@ -167,4 +154,3 @@ ${TESTS_BINARY} \
     -test.v \
     "${GINKGO_FLAKE}" \
     "${skip_arg}"
-
