@@ -1,5 +1,13 @@
 FROM src
 
-RUN yum install -y expect sqlite-3
-COPY oc /usr/bin/oc
+RUN dnf install -y --nodocs --setopt=install_weak_deps=False \
+    expect sqlite \
+    && dnf clean all \
+    && rm -rfv \
+        /var/cache/dnf \
+        /var/lib/dnf \
+        /var/log/dnf.* \
+        /var/log/hawkey.log \
+        /var/cache/ldconfig
 
+COPY oc /usr/bin/oc
