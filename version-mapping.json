@@ -28,8 +28,8 @@
     "bundle_version": "v4.11.9-170"
   },
   "4.12": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860645",
-    "bundle_version": "v4.12.15-12"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860738",
+    "bundle_version": "v4.12.15-13"
   },
   "4.13": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:860323",
@@ -40,16 +40,16 @@
     "bundle_version": "v4.14.10.rhel9-59"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860268",
-    "bundle_version": "v4.15.7.rhel9-269"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860736",
+    "bundle_version": "v4.15.7.rhel9-272"
   },
   "4.16": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860655",
-    "bundle_version": "v4.16.4.rhel9-267"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860737",
+    "bundle_version": "v4.16.4.rhel9-268"
   },
   "4.17": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860647",
-    "bundle_version": "v4.17.1.rhel9-134"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:860704",
+    "bundle_version": "v4.17.1.rhel9-135"
   },
   "4.18": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:860646",
