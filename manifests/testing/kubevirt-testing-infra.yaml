@@ -99,13 +99,19 @@ spec:
       serviceAccountName: kubevirt-testing
       containers:
         - name: target
-          image: quay.io/kubevirt/disks-images-provider:latest
+          image: quay.io/kubevirt/disks-images-provider:v1.4.0
           imagePullPolicy: Always
+          env:
+            - name: NUM_TEST_IMAGE_REPLICAS
+              value: "8"
           volumeMounts:
           - name: images
             mountPath: /hostImages
           - name: local-storage
             mountPath: /local-storage
+          - name: host-dir
+            mountPath: /host
+            mountPropagation: Bidirectional
           securityContext:
             privileged: true
           readinessProbe:
@@ -124,6 +130,9 @@ spec:
           hostPath:
             path: /mnt/local-storage
             type: DirectoryOrCreate
+        - name: host-dir
+          hostPath:
+            path: /
 ---
 apiVersion: v1
 kind: PersistentVolume
