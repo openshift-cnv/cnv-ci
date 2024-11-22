@@ -152,5 +152,6 @@ ${TESTS_BINARY} \
     -utility-container-prefix=quay.io/kubevirt \
     -test.timeout=3h \
     -test.v \
+    -utility-container-tag="${UTILITY_CONTAINER_TAG:-v1.4.0}" \
     "${GINKGO_FLAKE}" \
     "${skip_arg}"
