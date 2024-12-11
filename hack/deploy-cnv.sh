@@ -19,6 +19,9 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "OCP_VERSION: $OCP_VERSION"
 
+CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
+CNV_SUBSCRIPTION_CHANNEL=${CNV_SUBSCRIPTION_CHANNEL:-stable}
+
 oc create ns "${TARGET_NAMESPACE}"
 
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
@@ -32,7 +35,7 @@ metadata:
   labels:
     operators.coreos.com/kubevirt-hyperconverged.openshift-cnv: ''
 spec:
-  channel: stable
+  channel: ${CNV_SUBSCRIPTION_CHANNEL}
   installPlanApproval: Automatic
   name: kubevirt-hyperconverged
   source: redhat-operators
@@ -40,8 +43,8 @@ spec:
 EOF
 
 else
-    eval "$(jq -r '."'"$OCP_VERSION"'" | to_entries[] | .key+"="+.value' version-mapping.json)"
-    
+    eval "$(jq -r '."'"${CNV_VERSION}"'" | to_entries[] | .key+"="+.value' version-mapping.json)"
+
     # These variables are set when the eval above is executed
     # shellcheck disable=SC2154
     echo "Using index_image: $index_image"
@@ -63,7 +66,7 @@ metadata:
   labels:
     operators.coreos.com/kubevirt-hyperconverged.openshift-cnv: ''
 spec:
-  channel: stable
+  channel: ${CNV_SUBSCRIPTION_CHANNEL}
   installPlanApproval: Automatic
   name: kubevirt-hyperconverged
   source: brew-catalog-source
