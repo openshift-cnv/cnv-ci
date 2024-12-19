@@ -1,0 +1,8 @@
+{
+  "storageClassRhel":     "gp3-csi",
+  "storageClassWindows":  "gp3-csi",
+  "storageRWOBlock":      "gp3-csi",
+  "storageRWOFileSystem": "gp3-csi",
+  "storageRWXBlock":      "gp3-csi",
+  "storageSnapshot":      "gp3-csi"
+}
