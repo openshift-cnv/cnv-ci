@@ -137,7 +137,7 @@ else
   GINKGO_SLOW="--ginkgo.slow-spec-threshold=60s"
 fi
 
-
+cat /etc/os-release
 echo "Starting tests 🧪"
 ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
