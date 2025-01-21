@@ -37,18 +37,18 @@ cat <<EOF
 =================================
 EOF
 
-if [ -n "${ARTIFACTS}" ]; then
+if [ -n "${ARTIFACT_DIR}" ]; then
     cat <<EOF
 ==============================
 executing cnv-must-gather
 ==============================
 
 EOF
-    mkdir -p ${ARTIFACTS}/cnv-must-gather
-    mkdir -p ${ARTIFACTS}/cnv-must-gather-vms
+    mkdir -p ${ARTIFACT_DIR}/cnv-must-gather
+    mkdir -p ${ARTIFACT_DIR}/cnv-must-gather-vms
     CNV_MG_IMAGE=$(${CMD} get csv -n openshift-cnv -o json | jq -r '.items[0].spec.relatedImages[] | select (.name | contains("must-gather")) | .image')
-    RunCmd "${CMD} adm must-gather --image=${CNV_MG_IMAGE} --dest-dir=${ARTIFACTS}/cnv-must-gather --timeout='30m'"
-    RunCmd "${CMD} adm must-gather --image=${CNV_MG_IMAGE} --dest-dir=${ARTIFACTS}/cnv-must-gather-vms --timeout='30m' -- /usr/bin/gather --vms_details"
+    RunCmd "${CMD} adm must-gather --image=${CNV_MG_IMAGE} --dest-dir=${ARTIFACT_DIR}/cnv-must-gather --timeout='30m'"
+    RunCmd "${CMD} adm must-gather --image=${CNV_MG_IMAGE} --dest-dir=${ARTIFACT_DIR}/cnv-must-gather-vms --timeout='30m' -- /usr/bin/gather --vms_details"
 fi
 
 cat <<EOF
