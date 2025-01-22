@@ -122,8 +122,8 @@ skip_tests+=('Prometheus Endpoints')
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
 
-
-mkdir -p "${ARTIFACT_DIR}"
+export ARTIFACTS="${ARTIFACT_DIR}"
+mkdir -p "${ARTIFACTS}"
 
 if [[ "$OCP_VERSION" == "4.10" ]];
 then
@@ -142,7 +142,7 @@ ${TESTS_BINARY} \
     -cdi-namespace="$TARGET_NAMESPACE" \
     -config="./manifests/testing/${KUBEVIRT_TESTING_CONFIGURATION_FILE}" \
     -installed-namespace="$TARGET_NAMESPACE" \
-    -junit-output="${ARTIFACT_DIR}/junit.functest.xml" \
+    -junit-output="${ARTIFACTS}/junit.functest.xml" \
     -kubeconfig="$KUBECONFIG" \
     -ginkgo.focus='(rfe_id:1177)|(rfe_id:273)|(rfe_id:151)' \
     "${GINKGO_NOCOLOR}" \
