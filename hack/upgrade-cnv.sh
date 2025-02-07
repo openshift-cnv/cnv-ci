@@ -77,10 +77,10 @@ if [ "$PRODUCTION_RELEASE" = "true" ]; then
 else
     echo "installing ${OLD_CSV} from brew registry"
     
-    echo "setting up brew catalog source"
-    "$SCRIPT_DIR"/create-brew-catalogsource.sh
+    echo "setting up cnv catalog source"
+    "$SCRIPT_DIR"/create-cnv-catalogsource.sh "${index_image}"
 
-    INITIALSOURCE=brew-catalog-source
+    INITIALSOURCE=cnv-catalog-source
 fi
 
 echo "creating subscription"
