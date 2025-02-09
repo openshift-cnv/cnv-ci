@@ -97,8 +97,7 @@ func generateMentionBlock() slack.Block {
 	}
 	return slack.NewRichTextBlock("mention", slack.NewRichTextSection(
 		slack.NewRichTextSectionTextElement("cc: ", nil),
-		//slack.NewRichTextSectionUserGroupElement(groupId),
-		slack.NewRichTextSectionUserElement(groupId, nil),
+		slack.NewRichTextSectionUserGroupElement(groupId),
 	))
 }
 
@@ -158,5 +157,7 @@ func main() {
 		} else {
 			log.Printf("Successfully sent Slack message")
 		}
+	} else {
+		log.Printf("All jobs passed, no need to send any message.")
 	}
 }
