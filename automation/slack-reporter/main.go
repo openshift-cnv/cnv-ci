@@ -3,21 +3,25 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"golang.org/x/net/html"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/slack-go/slack"
 )
 
-var versions = []string{"4.17", "4.18", "4.19"}
+var versions = []string{"4.16", "4.17", "4.18", "4.19"}
 
-const baseProwURL = "https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-e2e-azure-deploy-cnv/"
+const prowHostname = "https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com"
+const baseProwURL = prowHostname + "/gcs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-e2e-azure-deploy-cnv/"
 const finishedURL = baseProwURL + "%s/finished.json"
 const jobURLTemplate = baseProwURL + "%s/prowjob.json"
+const jobHistoryPageTemplate = "https://prow.ci.openshift.org/job-history/gs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-e2e-azure-deploy-cnv"
 
 type FinishedJSON struct {
 	Passed    bool  `json:"passed"`
@@ -127,6 +131,111 @@ func getJobUrl(latestBuild, version string) (string, error) {
 	return job.Status.URL, nil
 }
 
+func extractJobs(n *html.Node) []string {
+	var links []string
+	if n.Type == html.ElementNode && n.Data == "a" {
+		for _, attr := range n.Attr {
+			if attr.Key == "href" && strings.Contains(attr.Val, "/gcs/test-platform-results/logs/") &&
+				!strings.Contains(attr.Val, "latest-build") {
+				links = append(links, attr.Val)
+			}
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		links = append(links, extractJobs(c)...)
+	}
+
+	return links
+}
+
+func getLastResults(hrefs []string) ([]FinishedJSON, error) {
+	finishedSlice := []FinishedJSON{}
+	for _, href := range hrefs {
+		resp, err := http.Get(prowHostname + href + "/finished.json")
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		finishedJsonStr := strings.TrimSpace(string(body))
+		finished := FinishedJSON{}
+		if err := json.Unmarshal([]byte(finishedJsonStr), &finished); err != nil {
+			return nil, err
+		}
+		if finished.Passed {
+			finishedSlice = append(finishedSlice, finished)
+			fmt.Printf("%s job has passed. Adding it to list.\n", href)
+		} else {
+			fmt.Printf("%s job has failed.\n", href)
+			break
+		}
+	}
+	return finishedSlice, nil
+}
+
+func getLastBuildsforVersion(version string) []FinishedJSON {
+	lastBuildsURL := fmt.Sprintf(baseProwURL, version)
+	lastBuildsHtmlResp, err := http.Get(lastBuildsURL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to fetch last builds for version %s: %v\n", version, err)
+		return []FinishedJSON{}
+	}
+	lastBuildsHtmlDoc, err := html.Parse(lastBuildsHtmlResp.Body)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to parse last builds for version %s: %v\n", version, err)
+	}
+	hrefs := extractJobs(lastBuildsHtmlDoc)
+	sort.Sort(sort.Reverse(sort.StringSlice(hrefs)))
+	builds, err := getLastResults(hrefs)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to fetch last builds for version %s: %v\n", version, err)
+	}
+	return builds
+}
+
+func checkSuccessfulLast7jobs() bool {
+	countSuccessfulVersions := 0
+	for _, version := range versions {
+		builds := getLastBuildsforVersion(version)
+		if len(builds) >= 7 {
+			countSuccessfulVersions++
+		}
+	}
+	if len(versions) == countSuccessfulVersions {
+		return true
+	}
+	return false
+}
+
+func sendSlackMessageSuccess(client *slack.Client) error {
+	listElements := []slack.RichTextElement{}
+	for _, version := range versions {
+		linkElement := slack.NewRichTextSectionLinkElement(fmt.Sprintf(jobHistoryPageTemplate, version), version, &slack.RichTextSectionTextStyle{Bold: true})
+		section := slack.NewRichTextSection(linkElement)
+		listElements = append(listElements, section)
+	}
+	richTextList := slack.NewRichTextList(slack.RTEListBullet, 0, listElements...)
+	listBlock := slack.NewRichTextBlock("keepalive_block", richTextList)
+	message := []slack.Block{
+		slack.NewRichTextBlock(fmt.Sprintf("keepalive-message"), slack.NewRichTextSection(
+			slack.NewRichTextSectionEmojiElement("solid-success", 2, nil),
+			slack.NewRichTextSectionEmojiElement("tada", 2, nil),
+			slack.NewRichTextSectionTextElement(" All CNV informing jobs ran in the last 7 days have passed:", nil),
+		)),
+		listBlock,
+	}
+
+	err := sendSlackMessage(client, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	slackToken := os.Getenv("HCO_REPORTER_SLACK_TOKEN")
 	if slackToken == "" {
@@ -140,7 +249,7 @@ func main() {
 	for _, version := range versions {
 		block, err := checkJobStatus(version)
 		if err != nil {
-			log.Println(err)
+			fmt.Println(err)
 			continue
 		}
 
@@ -153,11 +262,19 @@ func main() {
 	if len(failedBlocks) > 0 {
 		failedBlocks = append(failedBlocks, generateMentionBlock())
 		if err := sendSlackMessage(slackClient, failedBlocks); err != nil {
-			log.Printf("Failed to send Slack message: %v", err)
+			fmt.Printf("Failed to send Slack message: %v\n", err)
 		} else {
-			log.Printf("Successfully sent Slack message")
+			fmt.Println("Successfully sent Slack message")
 		}
 	} else {
-		log.Printf("All jobs passed, no need to send any message.")
+		fmt.Println("All jobs passed, checking for keepalive message.")
+		success := checkSuccessfulLast7jobs()
+		if success {
+			if err := sendSlackMessageSuccess(slackClient); err != nil {
+				fmt.Printf("Failed to send Slack message: %v\n", err)
+			}
+		} else {
+			fmt.Println("Condition for sending a keepalive message is not satisfied.")
+		}
 	}
 }
