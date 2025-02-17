@@ -24,14 +24,14 @@ spec:
             masquerade: {}
         resources:
           requests:
-            memory: 64M
+            memory: 128M
       networks:
       - name: default
         pod: {}
       volumes:
         - name: containerdisk
           containerDisk:
-            image: quay.io/kubevirt/cirros-container-disk-demo
+            image: quay.io/kubevirt/cirros-container-disk-demo:v1.5.0-beta.0
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:
