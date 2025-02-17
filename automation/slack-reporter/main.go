@@ -58,7 +58,7 @@ func checkJobStatus(version string) ([]slack.Block, error) {
 
 	var result FinishedJSON
 	if err := json.Unmarshal([]byte(finishedData), &result); err != nil {
-		return nil, fmt.Errorf("failed to parse finished.json for %s: %v", version, err)
+		return nil, fmt.Errorf("%s is still running", version)
 	}
 	finishedTime := time.Unix(result.Timestamp, 0).UTC()
 
@@ -163,7 +163,8 @@ func getLastResults(hrefs []string) ([]FinishedJSON, error) {
 		finishedJsonStr := strings.TrimSpace(string(body))
 		finished := FinishedJSON{}
 		if err := json.Unmarshal([]byte(finishedJsonStr), &finished); err != nil {
-			return nil, err
+			fmt.Printf("finished.json for %s has not been found.\n", href)
+			continue
 		}
 		if finished.Passed {
 			finishedSlice = append(finishedSlice, finished)
