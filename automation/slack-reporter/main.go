@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -58,7 +59,7 @@ func checkJobStatus(version string) ([]slack.Block, error) {
 
 	var result FinishedJSON
 	if err := json.Unmarshal([]byte(finishedData), &result); err != nil {
-		return nil, fmt.Errorf("%s is still running", version)
+		return nil, fmt.Errorf("%s latest job is still running", version)
 	}
 	finishedTime := time.Unix(result.Timestamp, 0).UTC()
 
@@ -198,14 +199,13 @@ func getLastBuildsforVersion(version string) []FinishedJSON {
 }
 
 func checkSuccessfulLast7jobs() bool {
-	countSuccessfulVersions := 0
+	var consecutiveSuccessfulBuilds []int
 	for _, version := range versions {
 		builds := getLastBuildsforVersion(version)
-		if len(builds) >= 7 {
-			countSuccessfulVersions++
-		}
+		consecutiveSuccessfulBuilds = append(consecutiveSuccessfulBuilds, len(builds))
 	}
-	if len(versions) == countSuccessfulVersions {
+	minPassLength := slices.Min(consecutiveSuccessfulBuilds)
+	if minPassLength%7 == 0 {
 		return true
 	}
 	return false
