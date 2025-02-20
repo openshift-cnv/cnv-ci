@@ -1,0 +1,8 @@
+{
+  "storageClassRhel":        "ocs-storagecluster-ceph-rbd",
+  "storageClassWindows":     "ocs-storagecluster-ceph-rbd",
+  "storageRWXBlock":         "ocs-storagecluster-ceph-rbd",
+  "storageRWOFileSystem":    "ocs-storagecluster-ceph-rbd",
+  "storageRWOBlock":         "ocs-storagecluster-ceph-rbd",
+  "storageSnapshot":         "ocs-storagecluster-ceph-rbd"
+}

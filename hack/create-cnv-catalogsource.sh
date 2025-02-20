@@ -2,31 +2,32 @@
 
 set -euxo pipefail
 
-eval "$(jq -r '."'"$OCP_VERSION"'" | to_entries[] | .key+"="+.value' version-mapping.json)"
+CNV_CATALOG_IMAGE=${1:?Missing catalog image for the catalog source}
+CNV_CATALOG_SOURCE='cnv-catalog-source'
 
-echo "creating brew catalog source"
+echo "creating CNV catalog source"
 oc create -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: brew-catalog-source
+  name: ${CNV_CATALOG_SOURCE}
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: $index_image
-  displayName: Brew Catalog Source
+  image: ${CNV_CATALOG_IMAGE}
+  displayName: CNV Catalog Source
   publisher: grpc
 EOF
 
-while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="brew-catalog-source" --no-headers | wc -l)" -ne 1 ]; do
+while [ "$(oc get pods -n "openshift-marketplace" -l olm.catalogSource="${CNV_CATALOG_SOURCE}" --no-headers | wc -l)" -ne 1 ]; do
     echo "waiting for catalog source pod to be created"
     sleep 5
 done
 
-echo "waiting for the brew catalog source to become ready"
+echo "waiting for the CNV catalog source to become ready"
 CATALOG_SOURCE_READY=false
 for i in $(seq 1 60); do
-  if [ "$(oc get catsrc brew-catalog-source -n "openshift-marketplace" -o jsonpath='{.status.connectionState.lastObservedState}')" == "READY" ]
+  if [ "$(oc get catsrc "${CNV_CATALOG_SOURCE}" -n "openshift-marketplace" -o jsonpath='{.status.connectionState.lastObservedState}')" == "READY" ]
   then
     CATALOG_SOURCE_READY=true
     echo "the brew catalog source is ready."
