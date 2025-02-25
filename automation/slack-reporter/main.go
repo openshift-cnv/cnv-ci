@@ -19,10 +19,10 @@ import (
 var versions = []string{"4.16", "4.17", "4.18", "4.19"}
 
 const prowHostname = "https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com"
-const baseProwURL = prowHostname + "/gcs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-e2e-azure-deploy-cnv/"
+const baseProwURL = prowHostname + "/gcs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-deploy-azure-kubevirt-ovn/"
 const finishedURL = baseProwURL + "%s/finished.json"
 const jobURLTemplate = baseProwURL + "%s/prowjob.json"
-const jobHistoryPageTemplate = "https://prow.ci.openshift.org/job-history/gs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-e2e-azure-deploy-cnv"
+const jobHistoryPageTemplate = "https://prow.ci.openshift.org/job-history/gs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-deploy-azure-kubevirt-ovn"
 
 type FinishedJSON struct {
 	Passed    bool  `json:"passed"`
