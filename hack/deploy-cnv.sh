@@ -42,6 +42,24 @@ function get_cnv_catalog_image() {
     fi
 }
 
+function get_cnv_channel() {
+    # Environment variable has higher priority
+    if [ -n "${CNV_SUBSCRIPTION_CHANNEL-}" ]; then
+        return
+    fi
+
+    # Fallback to the channel requested in the Prow job spec if any
+    if [ -n "${PROW_JOB_ID-}" ]; then
+        CNV_SUBSCRIPTION_CHANNEL=$(
+          curl -fsSL https://prow.ci.openshift.org/prowjob?prowjob=${PROW_JOB_ID} \
+            | sed -nr '/name: CNV_CHANNEL/ { n; s|\s+value: (.*)|\1|p }'
+        )
+    fi
+
+    # Ultimate fallback, use stable channel
+    : "${CNV_SUBSCRIPTION_CHANNEL:=stable}"
+}
+
 trap "cleanup" INT TERM EXIT
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -49,7 +67,6 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 echo "OCP_VERSION: $OCP_VERSION"
 
 CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
-CNV_SUBSCRIPTION_CHANNEL=${CNV_SUBSCRIPTION_CHANNEL:-stable}
 
 oc create ns "${TARGET_NAMESPACE}"
 
@@ -65,6 +82,8 @@ else
     echo "setting up CNV catalog source"
     "$SCRIPT_DIR"/create-cnv-catalogsource.sh "${CNV_CATALOG_IMAGE}"
 fi
+
+get_cnv_channel
 
 echo "creating subscription"
 oc create -f - <<EOF
