@@ -49,7 +49,6 @@ echo "create testing infrastructure"
 [ "$(oc get PersistentVolume host-path-disk-alpine)" ] || oc create -n "${TARGET_NAMESPACE}" -f ./manifests/testing/kubevirt-testing-infra.yaml
 
 echo "waiting for testing infrastructure to be ready"
-oc wait deployment cdi-http-import-server -n "${TARGET_NAMESPACE}" --for condition=Available --timeout=10m
 oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=20m
 
 skip_tests+=('\[QUARANTINE\]')
@@ -109,6 +108,9 @@ skip_tests+=('test_id:6993')
 skip_tests+=('test_id:6311')
 skip_tests+=('test_id:7164')
 skip_tests+=('test_id:7679')
+skip_tests+=('test_id:1520')
+skip_tests+=('test_id:1521')
+skip_tests+=('test_id:1525')
 skip_tests+=('\[Serial\] Should leave a failed VMI')
 skip_tests+=('VirtualMachine crash loop backoff should backoff attempting to create a new VMI when')
 skip_tests+=('Using expand command')
@@ -153,5 +155,6 @@ ${TESTS_BINARY} \
     -utility-container-prefix=quay.io/kubevirt \
     -test.timeout=3h \
     -test.v \
+    -utility-container-tag="${UTILITY_CONTAINER_TAG:-v1.4.0}" \
     "${GINKGO_FLAKE}" \
     "${skip_arg}"
