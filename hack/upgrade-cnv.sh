@@ -77,10 +77,10 @@ if [ "$PRODUCTION_RELEASE" = "true" ]; then
 else
     echo "installing ${OLD_CSV} from brew registry"
     
-    echo "setting up brew catalog source"
-    "$SCRIPT_DIR"/create-brew-catalogsource.sh
+    echo "setting up cnv catalog source"
+    "$SCRIPT_DIR"/create-cnv-catalogsource.sh "${index_image}"
 
-    INITIALSOURCE=brew-catalog-source
+    INITIALSOURCE=cnv-catalog-source
 fi
 
 echo "creating subscription"
@@ -144,7 +144,7 @@ chmod +x ~/virtctl
 
 echo "----- Create a simple VM on the previous version cluster, before the upgrade"
 oc create namespace ${VMS_NAMESPACE}
-ssh-keygen -f ./hack/test_ssh -q -N ""
+ssh-keygen -f ./hack/test_ssh -q -N "" -t ecdsa -b 384
 cat << END > ./hack/cloud-init.sh
 #!/bin/sh
 export NEW_USER="cirros"
@@ -227,12 +227,5 @@ fi
 ~/virtctl stop testvm -n "${VMS_NAMESPACE}"
 oc delete vm -n "${VMS_NAMESPACE}" testvm
 oc delete ns "${VMS_NAMESPACE}"
-
-# The previous CSV get deleted with "background deletion" propagation
-# policy, i.e. before its owned resources are completely removed.
-# Therefore, we wait for a few more minutes to let these resources be
-# completely deleted, to avoid any conflicts in the subsequent test execution.
-echo "waiting for residual resources to complete deletion"
-sleep 10m
 
 echo "HyperConverged operator upgrade successfully completed"
