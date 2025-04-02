@@ -7,6 +7,8 @@ help:
 
 deploy_test: disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv
 
+deploy_test_arm64: disable_default_catalog_source update_pull_secret set_imagecontentsourcepolicy deploy_cnv test_cnv_arm64
+
 upgrade_test: update_pull_secret set_imagecontentsourcepolicy upgrade_cnv test_cnv
 
 disable_default_catalog_source:
@@ -27,6 +29,10 @@ upgrade_cnv:
 test_cnv:
 	hack/patch-hco-pre-test.sh
 	hack/test-cnv.sh
+
+test_cnv_arm64:
+	hack/patch-hco-pre-test.sh
+	hack/test-cnv-arm64.sh
 
 quicklab:
 	hack/quicklab.sh
