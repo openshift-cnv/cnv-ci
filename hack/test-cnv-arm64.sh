@@ -51,6 +51,13 @@ echo "create testing infrastructure"
 echo "waiting for testing infrastructure to be ready"
 oc wait pods -l "kubevirt.io=disks-images-provider" -n "${TARGET_NAMESPACE}" --for condition=Ready --timeout=20m
 
+# Temporary workaround for CNV-60160
+oc label nodes \
+  --overwrite \
+  --selector='node-role.kubernetes.io/worker' \
+  machine-type.node.kubevirt.io/virt=true \
+  machine-type.node.kubevirt.io/virt-rhel9.6.0=true
+
 skip_tests+=('\[QUARANTINE\]')
 
 # Skipping a few unreliable tests
