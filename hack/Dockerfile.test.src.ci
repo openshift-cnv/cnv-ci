@@ -1,0 +1,5 @@
+FROM src
+
+RUN dnf update -y \
+    && dnf install -y jq \
+    && dnf clean all
