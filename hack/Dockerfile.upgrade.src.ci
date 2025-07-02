@@ -1,7 +1,7 @@
 FROM src
 
 RUN dnf install -y --nodocs --setopt=install_weak_deps=False \
-    expect sqlite \
+    expect sqlite jq \
     && dnf clean all \
     && rm -rfv \
         /var/cache/dnf \
