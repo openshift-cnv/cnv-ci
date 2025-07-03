@@ -150,7 +150,6 @@ ${TESTS_BINARY} \
     "${GINKGO_SLOW}" \
     -ginkgo.v \
     -ginkgo.trace \
-    -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
     -test.timeout=3h \

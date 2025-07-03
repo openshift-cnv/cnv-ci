@@ -78,7 +78,6 @@ ${TESTS_BINARY} \
     -ginkgo.seed=0 \
     -ginkgo.v \
     -ginkgo.trace \
-    -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
     -test.timeout=3h \
