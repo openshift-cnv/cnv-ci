@@ -14,10 +14,10 @@ if [ "$PRODUCTION_RELEASE" = "false" ]; then
 fi
 KUBEVIRT_TAG=$(oc image info -a /tmp/authfile.new ${VIRT_OPERATOR_IMAGE} -o json --filter-by-os=linux/amd64 | jq '.config.config.Labels["upstream-version"]')
 KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1}' | tr -d '"')
-if [[ ${KUBEVIRT_TAG} == *"rc"* ]] || [[ ${KUBEVIRT_TAG} == *"alpha"* ]]; then
+if [[ ${KUBEVIRT_TAG} == *"rc"* ]] || [[ ${KUBEVIRT_TAG} == *"alpha"* ]] || [[ ${KUBEVIRT_TAG} == *"beta"* ]]; then
   KUBEVIRT_TESTS_URL=https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_RELEASE}/tests.test
   if ! curl --output /dev/null --silent --head --fail "${KUBEVIRT_TESTS_URL}"; then
-    # First checking if the official release exists (without "rc" or "alpha"). If not - use the release candidate version.
+    # First checking if the official release exists (without "rc", "alpha" or "beta"). If not - use the release candidate version.
     KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1"-"$2}' | tr -d '"')
   fi
 fi
@@ -150,7 +150,6 @@ ${TESTS_BINARY} \
     "${GINKGO_SLOW}" \
     -ginkgo.v \
     -ginkgo.trace \
-    -oc-path="$(which oc)" \
     -kubectl-path="$(which oc)" \
     -utility-container-prefix=quay.io/kubevirt \
     -test.timeout=3h \
