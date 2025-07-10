@@ -16,7 +16,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-var versions = []string{"4.16", "4.17", "4.18", "4.19"}
+var versions = []string{"4.16", "4.17", "4.18", "4.19", "4.20"}
 
 const prowHostname = "https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com"
 const baseProwURL = prowHostname + "/gcs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-deploy-azure-kubevirt-ovn/"
@@ -205,7 +205,7 @@ func checkSuccessfulLast7jobs() bool {
 		consecutiveSuccessfulBuilds = append(consecutiveSuccessfulBuilds, len(builds))
 	}
 	minPassLength := slices.Min(consecutiveSuccessfulBuilds)
-	if minPassLength%7 == 0 {
+	if minPassLength%7 == 0 && minPassLength > 0 {
 		return true
 	}
 	return false
