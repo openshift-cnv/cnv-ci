@@ -56,6 +56,13 @@ function get_cnv_channel() {
         )
     fi
 
+    # Fallback, get channel from mapping file
+    if [ -z "${CNV_SUBSCRIPTION_CHANNEL-}" ]; then
+        CNV_SUBSCRIPTION_CHANNEL=$(
+          jq -r '."'"${CNV_VERSION}"'".channel // empty' version-mapping.json
+        )
+    fi
+
     # Ultimate fallback, use stable channel
     : "${CNV_SUBSCRIPTION_CHANNEL:=stable}"
 }
