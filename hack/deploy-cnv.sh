@@ -2,6 +2,7 @@
 
 set -euxo pipefail
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 function cleanup() {
     rv=$?
@@ -67,13 +68,19 @@ function get_cnv_channel() {
     : "${CNV_SUBSCRIPTION_CHANNEL:=stable}"
 }
 
+function apply_idms() {
+    # Apply IDMS configuration
+    oc apply -f "${SCRIPT_DIR}/cnv_idms.yaml"
+}
+
 trap "cleanup" INT TERM EXIT
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "OCP_VERSION: $OCP_VERSION"
 
 CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
+
+apply_idms
 
 oc create ns "${TARGET_NAMESPACE}"
 
