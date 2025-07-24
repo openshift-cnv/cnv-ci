@@ -109,7 +109,6 @@ echo "OCP_VERSION: $OCP_VERSION"
 
 CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
 
-
 oc create ns "${TARGET_NAMESPACE}"
 
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
