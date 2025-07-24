@@ -75,8 +75,8 @@ function apply_idms() {
 
 # Wait until master and worker MCP are Updated
 # or timeout after 90min (default).
-wait_for_mcp_to_update()
-{
+wait_for_mcp_to_update() {
+
     local timeout_minutes=${1:-90}
     local poll_interval_seconds=30
     local max_attempts=$(( timeout_minutes * 60 / poll_interval_seconds ))
