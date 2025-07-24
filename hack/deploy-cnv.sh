@@ -79,6 +79,7 @@ oc create ns "${TARGET_NAMESPACE}"
 
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
     CNV_CATALOG_SOURCE='redhat-operators'
+    CNV_SUBSCRIPTION_CHANNEL='candidate'
 else
     CNV_CATALOG_SOURCE='cnv-catalog-source'
     get_cnv_catalog_image
