@@ -43,8 +43,8 @@
     "channel": "stable"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1013326",
-    "bundle_version": "v4.15.12.rhel9-35",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1014059",
+    "bundle_version": "v4.15.12.rhel9-36",
     "channel": "stable"
   },
   "4.16": {
@@ -53,8 +53,8 @@
     "channel": "nightly"
   },
   "4.17": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1013372",
-    "bundle_version": "v4.17.22.rhel9-5",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1014123",
+    "bundle_version": "v4.17.22.rhel9-7",
     "channel": "nightly"
   },
   "4.18": {
@@ -63,8 +63,8 @@
     "channel": "candidate"
   },
   "4.19": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1012024",
-    "bundle_version": "v4.19.2.rhel9-18",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1013980",
+    "bundle_version": "v4.19.2.rhel9-22",
     "channel": "candidate"
   },
   "4.20": {
