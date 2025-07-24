@@ -68,9 +68,38 @@ function get_cnv_channel() {
     : "${CNV_SUBSCRIPTION_CHANNEL:=stable}"
 }
 
+# Apply IDMS configuration
 function apply_idms() {
-    # Apply IDMS configuration
     oc apply -f "${SCRIPT_DIR}/cnv_idms.yaml"
+}
+
+# Wait until master and worker MCP are Updated
+# or timeout after 90min (default).
+wait_for_mcp_to_update()
+{
+    local timeout_minutes=${1:-90}
+    local poll_interval_seconds=30
+    local max_attempts=$(( timeout_minutes * 60 / poll_interval_seconds ))
+    local attempt=0
+
+    echo "Waiting for MCPs to update (timeout: ${timeout_minutes} minutes)"
+
+    while true; do
+        ((attempt++))
+
+        if oc wait mcp --all --for condition=updated --timeout=1m; then
+            echo "MCPs are updated."
+            return 0
+        fi
+
+        if (( attempt >= max_attempts )); then
+            echo "Error: MCPs did not update within ${timeout_minutes} minutes." >&2
+            return 1
+        fi
+
+        echo "Attempt ${attempt}/${max_attempts}: MCPs not yet updated, waiting ${poll_interval_seconds} seconds..."
+        sleep "${poll_interval_seconds}"
+    done
 }
 
 trap "cleanup" INT TERM EXIT
@@ -80,7 +109,6 @@ echo "OCP_VERSION: $OCP_VERSION"
 
 CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
 
-apply_idms
 
 oc create ns "${TARGET_NAMESPACE}"
 
@@ -88,6 +116,8 @@ if [ "$PRODUCTION_RELEASE" = "true" ]; then
     CNV_CATALOG_SOURCE='redhat-operators'
 else
     CNV_CATALOG_SOURCE='cnv-catalog-source'
+    apply_idms
+    wait_for_mcp_to_update
     get_cnv_catalog_image
 
     # shellcheck disable=SC2154
