@@ -85,7 +85,7 @@ wait_for_mcp_to_update() {
     echo "Waiting for MCPs to update (timeout: ${timeout_minutes} minutes)"
 
     while true; do
-        ((attempt++))
+        attempt=$((attempt+1))
 
         if oc wait mcp --all --for condition=updated --timeout=1m; then
             echo "MCPs are updated."
