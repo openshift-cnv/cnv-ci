@@ -118,10 +118,6 @@ skip_tests+=('Using virtctl interface')
 skip_tests+=('repeately starting vmis')
 skip_tests+=('Prometheus Endpoints')
 
-# TODO: remove once CNV v4.19.2 is released to production
-# https://issues.redhat.com/browse/CNV-66276
-skip_tests+=('issue #9438')
-
 
 skip_regex=$(printf '(%s)|' "${skip_tests[@]}")
 skip_arg=$(printf -- '--ginkgo.skip=%s' "${skip_regex:0:-1}")
