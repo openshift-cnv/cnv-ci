@@ -2,6 +2,7 @@
 
 set -euxo pipefail
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
+unset CNV_SUBSCRIPTION_CHANNEL
 
 function cleanup() {
     rv=$?
@@ -42,6 +43,19 @@ function get_cnv_catalog_image() {
     fi
 }
 
+function set_production_catalog_source() {
+  if oc get packagemanifest -o json | jq -r '.items[] | select(.status.catalogSource=="redhat-operators" and .metadata.name=="kubevirt-hyperconverged")' | grep kubevirt-hyperconverged-operator.v$OCP_VERSION
+  then
+    return
+  else
+    ONE_LOWER=$(awk -v v="$OCP_VERSION" 'BEGIN { v*=100; v-=1; printf "%.2f\n", v/100 }')
+    echo "CNV $OCP_VERSION was not found in the production catalog of $OCP_VERSION. Using the production catalog of one version below - $ONE_LOWER"
+    CNV_CATALOG_IMAGE=registry.redhat.io/redhat/redhat-operator-index:v$ONE_LOWER
+    "$SCRIPT_DIR"/create-cnv-catalogsource.sh "${CNV_CATALOG_IMAGE}"
+
+  fi
+}
+
 function get_cnv_channel() {
     # Environment variable has higher priority
     if [ -n "${CNV_SUBSCRIPTION_CHANNEL-}" ]; then
@@ -78,8 +92,17 @@ CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
 oc create ns "${TARGET_NAMESPACE}"
 
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
-    CNV_CATALOG_SOURCE='redhat-operators'
-    CNV_SUBSCRIPTION_CHANNEL='stable'
+  # if the CNV version exists in the existing prod catalog source - use it.
+  # if not, use the prod catalog of the previous minor version.
+    CNV_SUBSCRIPTION_CHANNEL='candidate'
+    output=$(set_production_catalog_source)
+    if [ -n "$output" ]
+    then
+      CNV_CATALOG_SOURCE='redhat-operators'
+    else
+      CNV_CATALOG_SOURCE='cnv-catalog-source'
+    fi
+
 else
     CNV_CATALOG_SOURCE='cnv-catalog-source'
     get_cnv_catalog_image
