@@ -4,12 +4,26 @@ set -euxo pipefail
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+function generateResultFileForCNVDeployment() {
+    results_file="${1}"
+    deployment_success="${2}"
+    echo "Generating a test suite with the CNV deployment result (Fail/Success): ${results_file}"
+    if [[ $deployment_success == "true" ]]; then
+      yq eval -n -o xml '.testsuite = {"name": "CNV-lp-interop", "tests": 1, "failures": 0, "testcase": {"name": "cnv_deployment"}}' > $results_file
+    else
+      yq eval -n -o xml '.testsuite = {"name": "CNV-lp-interop", "tests": 1, "failures": 1, "testcase": {"name": "cnv_deployment", "failure": 1}}' > $results_file
+    fi
+}
+
 function cleanup() {
     rv=$?
     if [ "x$rv" != "x0" ]; then
         echo "Error during deployment: exit status: $rv"
         make dump-state
         echo "*** CNV deployment failed ***"
+        generateResultFileForCNVDeployment "junit_cnv_deploy.xml" "false"
+    else
+        generateResultFileForCNVDeployment "junit_cnv_deploy.xml" "true"
     fi
     exit $rv
 }
