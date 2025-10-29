@@ -21,9 +21,9 @@ function cleanup() {
         echo "Error during deployment: exit status: $rv"
         make dump-state
         echo "*** CNV deployment failed ***"
-        generateResultFileForCNVDeployment "junit_cnv_deploy.xml" "false"
+        generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml" "false"
     else
-        generateResultFileForCNVDeployment "junit_cnv_deploy.xml" "true"
+        generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml" "true"
     fi
     exit $rv
 }
