@@ -44,7 +44,7 @@ function get_cnv_catalog_image() {
 }
 
 function latest_cnv_in_production() {
-  if oc get packagemanifest -o json | jq -r '.items[] | select(.status.catalogSource=="redhat-operators" and .metadata.name=="kubevirt-hyperconverged")' | grep kubevirt-hyperconverged-operator.v$OCP_VERSION
+  if oc get packagemanifest -o json | jq -r '.items[] | select(.status.catalogSource=="redhat-operators" and .metadata.name=="kubevirt-hyperconverged")' | grep -q kubevirt-hyperconverged-operator.v$OCP_VERSION
   then
     echo "${OCP_VERSION}"
   else
