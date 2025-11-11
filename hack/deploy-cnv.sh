@@ -92,7 +92,7 @@ oc create ns "${TARGET_NAMESPACE}"
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
   # if the CNV version exists in the existing prod catalog source - use it.
   # if not, use the prod catalog of the previous minor version.
-    CNV_SUBSCRIPTION_CHANNEL='candidate'
+    CNV_SUBSCRIPTION_CHANNEL='stable'
     version=$(latest_cnv_in_production)
     if [ "$version" = "$OCP_VERSION" ]
     then
