@@ -16,7 +16,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-var versions = []string{"4.16", "4.17", "4.18", "4.19", "4.20"}
+var versions = []string{"4.16", "4.17", "4.18", "4.19", "4.20", "4.21"}
 
 const prowHostname = "https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com"
 const baseProwURL = prowHostname + "/gcs/test-platform-results/logs/periodic-ci-openshift-release-master-cnv-nightly-%s-deploy-azure-kubevirt-ovn/"
