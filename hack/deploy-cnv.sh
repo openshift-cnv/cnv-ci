@@ -4,15 +4,36 @@ set -euxo pipefail
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+TOTAL=0
+FAILURES=0
+TESTCASES="[]"
+
+add_testcase() {
+    local name="$1"
+    local status="$2"
+
+    TOTAL=$((TOTAL + 1))
+
+    if [[ "$status" == "failure" ]]; then
+        FAILURES=$((FAILURES + 1))
+        TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$name"'", "failure": true}]')
+    else
+        TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$name"'"}]')
+    fi
+}
+
+
 function generateResultFileForCNVDeployment() {
     results_file="${1}"
     deployment_success="${2}"
     echo "Generating a test suite with the CNV deployment result (Fail/Success): ${results_file}"
     if [[ $deployment_success == "true" ]]; then
-      yq eval -n -o xml '.testsuite = {"name": "CNV-lp-interop", "tests": 1, "failures": 0, "testcase": {"name": "cnv_deployment"}}' > $results_file
+      add_testcase "cnv_deployment"
     else
-      yq eval -n -o xml '.testsuite = {"name": "CNV-lp-interop", "tests": 1, "failures": 1, "testcase": {"name": "cnv_deployment", "failure": 1}}' > $results_file
+      add_testcase "cnv_deployment" "failure"
     fi
+
+    yq eval -n -o -iI0 xml '.testsuite = {"name": "CNV-lp-interop", "tests": env(TOTAL), "failures": env(FAILURES), "testcase": (env(TESTCASES) | fromjson)}' > $results_file
 }
 
 function cleanup() {
@@ -55,6 +76,7 @@ function get_cnv_catalog_image() {
         STARTING_CSV=${bundle_version%-*}
         STARTING_CSV=${STARTING_CSV%.rhel*}
     fi
+    add_testcase "get_cnv_catalog_image"
 }
 
 function get_cnv_channel() {
@@ -80,11 +102,13 @@ function get_cnv_channel() {
 
     # Ultimate fallback, use stable channel
     : "${CNV_SUBSCRIPTION_CHANNEL:=stable}"
+    add_testcase "get_cnv_channel"
 }
 
 # Apply IDMS configuration
 function apply_idms() {
     oc apply -f "${SCRIPT_DIR}/cnv_idms.yaml"
+    add_testcase "apply_idms"
 }
 
 # Wait until master and worker MCP are Updated
@@ -114,6 +138,7 @@ wait_for_mcp_to_update() {
         echo "Attempt ${attempt}/${max_attempts}: MCPs not yet updated, waiting ${poll_interval_seconds} seconds..."
         sleep "${poll_interval_seconds}"
     done
+    add_testcase "wait_for_mcp_to_update"
 }
 
 trap "cleanup" INT TERM EXIT
@@ -129,9 +154,9 @@ if [ "$PRODUCTION_RELEASE" = "true" ]; then
     CNV_CATALOG_SOURCE='redhat-operators'
 else
     CNV_CATALOG_SOURCE='cnv-catalog-source'
-    apply_idms
-    wait_for_mcp_to_update
-    get_cnv_catalog_image
+    apply_idms || add_testcase "apply_idms" "failure"
+    wait_for_mcp_to_update || add_testcase "wait_for_mcp_to_update" "failure"
+    get_cnv_catalog_image || add_testcase "get_cnv_catalog_image" "failure"
 
     # shellcheck disable=SC2154
     echo "Using index_image: ${CNV_CATALOG_IMAGE}"
@@ -140,7 +165,7 @@ else
     "$SCRIPT_DIR"/create-cnv-catalogsource.sh "${CNV_CATALOG_IMAGE}"
 fi
 
-get_cnv_channel
+get_cnv_channel || add_testcase "get_cnv_channel" "failure"
 
 echo "creating subscription"
 oc create -f - <<EOF
