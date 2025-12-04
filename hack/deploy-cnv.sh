@@ -32,8 +32,7 @@ function generateResultFileForCNVDeployment() {
     else
       add_testcase "cnv_deployment" "failure"
     fi
-
-    yq eval -n -o -iI0 xml '.testsuite = {"name": "CNV-lp-interop", "tests": env(TOTAL), "failures": env(FAILURES), "testcase": (env(TESTCASES) | fromjson)}' > $results_file
+    yq eval -n --output-format=xml -I0 '.testsuite = {"name": "CNV-lp-interop", "tests": env(TOTAL), "failures": env(FAILURES), "testcase": env(TESTCASES)}' > $results_file
 }
 
 function cleanup() {
