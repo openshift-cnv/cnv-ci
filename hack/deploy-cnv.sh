@@ -4,9 +4,9 @@ set -euxo pipefail
 PRODUCTION_RELEASE=${PRODUCTION_RELEASE:-false}
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-TOTAL=0
-FAILURES=0
-TESTCASES="[]"
+export TOTAL=0
+export FAILURES=0
+export TESTCASES="[]"
 
 add_testcase() {
     local name="$1"
