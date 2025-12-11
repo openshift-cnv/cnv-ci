@@ -16,7 +16,7 @@ add_testcase() {
 
     if [[ "$test_passed" == "false" ]]; then
         FAILURES=$((FAILURES + 1))
-        TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'", "failure": true}]')
+        TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'", "failure": {"message": ""}}]')
     else
         TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'"}]')
     fi
