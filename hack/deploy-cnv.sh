@@ -8,7 +8,7 @@ export TOTAL=0
 export FAILURES=0
 export TESTCASES="[]"
 
-add_testcase() {
+function add_testcase() {
     local test_name="$1"
     local test_passed="$2"
 
@@ -17,11 +17,12 @@ add_testcase() {
     if [[ "$test_passed" == "false" ]]; then
         FAILURES=$((FAILURES + 1))
         TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'", "failure": {"message": ""}}]')
+        # trigger cleanup with failure exit status
+        exit 1
     else
         TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'"}]')
     fi
 }
-
 
 function generateResultFileForCNVDeployment() {
     results_file="${1}"
