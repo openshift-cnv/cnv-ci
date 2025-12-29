@@ -1,9 +1,15 @@
 FROM src
 
-# Install jq
+# Install required utils
 RUN dnf update -y \
-    && dnf install -y jq \
-    && dnf clean all
+&& dnf install -y jq curl \
+&& dnf clean all \
+&& rm -rfv \
+        /var/cache/dnf \
+        /var/lib/dnf \
+        /var/log/dnf.* \
+        /var/log/hawkey.log \
+        /var/cache/ldconfig
 
 # Install yq
 COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
