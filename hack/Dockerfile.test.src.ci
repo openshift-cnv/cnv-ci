@@ -2,9 +2,9 @@ FROM src
 
 # Install required utils
 RUN dnf update -y \
-&& dnf install -y jq curl \
-&& dnf clean all \
-&& rm -rfv \
+    && dnf install -y jq curl \
+    && dnf clean all \
+    && rm -rfv \
         /var/cache/dnf \
         /var/lib/dnf \
         /var/log/dnf.* \
