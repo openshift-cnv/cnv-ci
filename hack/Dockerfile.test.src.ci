@@ -1,5 +1,13 @@
 FROM src
 
+# Install jq
 RUN dnf update -y \
     && dnf install -y jq \
+    && dnf clean all
+
+# Install yq
+RUN dnf install -y curl \
+    && curl -L "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_$(uname -m | sed 's/aarch64/arm64/;s/x86_64/amd64/')" \
+       -o /usr/local/bin/yq \
+    && chmod +x /usr/local/bin/yq \
     && dnf clean all
