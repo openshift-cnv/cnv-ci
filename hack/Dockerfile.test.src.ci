@@ -11,5 +11,6 @@ RUN dnf update -y \
         /var/log/hawkey.log \
         /var/cache/ldconfig
 
-# Install yq
+# Install yq and verify installation
 COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
+RUN chmod +x /usr/bin/yq && yq --version
