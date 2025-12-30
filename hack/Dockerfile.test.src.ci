@@ -11,6 +11,7 @@ RUN dnf update -y \
         /var/log/hawkey.log \
         /var/cache/ldconfig
 
-# Install yq and verify installation
-COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
-RUN chmod +x /usr/bin/yq && yq --version
+# Install yq
+RUN YQ_LATEST_VERSION=$(curl -fsSL -H 'Accept: application/json' https://github.com/mikefarah/yq/releases/latest | jq -r .tag_name) && \
+    curl -fsSLo /usr/bin/yq "https://github.com/mikefarah/yq/releases/download/$YQ_LATEST_VERSION/yq_linux_amd64" && \
+    chmod +x /usr/bin/yq
