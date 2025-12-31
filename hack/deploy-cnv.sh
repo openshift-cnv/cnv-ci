@@ -8,6 +8,21 @@ export TOTAL=0
 export FAILURES=0
 export TESTCASES="[]"
 
+function install_yq_if_not_exists() {
+    # Install yq manually if not found in image
+    echo "Checking if yq exists"
+    cmd_yq="$(yq --version 2>/dev/null || true)"
+    if [ -n "$cmd_yq" ]; then
+        echo "yq version: $cmd_yq"
+    else
+        echo "Installing yq"
+        mkdir -p /tmp/bin
+        export PATH=$PATH:/tmp/bin/
+        curl -L "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_$(uname -m | sed 's/aarch64/arm64/;s/x86_64/amd64/')" \
+         -o /tmp/bin/yq && chmod +x /tmp/bin/yq
+    fi
+}
+
 function add_testcase() {
     local test_name="$1"
     local test_passed="$2"
@@ -27,6 +42,7 @@ function add_testcase() {
 function generateResultFileForCNVDeployment() {
     results_file="${1}"
     deployment_success="${2}"
+
     echo "Generating a test suite with the CNV deployment result (Fail/Success): ${results_file}"
     if [[ "$deployment_success" == "true" ]]; then
       add_testcase "cnv_deployment" $deployment_success
@@ -143,6 +159,8 @@ wait_for_mcp_to_update() {
 
 trap "cleanup" INT TERM EXIT
 
+# Deployment XML result file setup
+install_yq_if_not_exists
 
 echo "OCP_VERSION: $OCP_VERSION"
 
