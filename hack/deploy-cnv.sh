@@ -31,7 +31,7 @@ function add_testcase() {
 
     if [[ "$test_passed" == "false" ]]; then
         FAILURES=$((FAILURES + 1))
-        TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'", "failure": {"message": ""}}]')
+        TESTCASES=$(echo "$TESTCASES" | yq -o=json '. += [{"name": "'"$test_name"'", "failure": {"message": "Failed step"}}]')
         # trigger cleanup with failure exit status
         exit 1
     else
