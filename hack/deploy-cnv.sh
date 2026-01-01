@@ -41,10 +41,8 @@ function add_testcase() {
 
 function generateResultFileForCNVDeployment() {
     results_file="${1}"
-    deployment_success="${2}"
 
     echo "Generating a test suite with the CNV deployment result (Fail/Success): ${results_file}"
-    add_testcase "cnv_deployment" $deployment_success
     yq eval -n --output-format=xml -I0 '.testsuite = {"name": "CNV-lp-interop", "tests": env(TOTAL), "failures": env(FAILURES), "testcase": env(TESTCASES)}' > $results_file
 }
 
@@ -54,10 +52,8 @@ function cleanup() {
         echo "Error during deployment: exit status: $rv"
         make dump-state
         echo "*** CNV deployment failed ***"
-        generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml" "false"
-    else
-        generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml" "true"
     fi
+    generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml"
     exit $rv
 }
 
