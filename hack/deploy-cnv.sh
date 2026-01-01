@@ -44,11 +44,7 @@ function generateResultFileForCNVDeployment() {
     deployment_success="${2}"
 
     echo "Generating a test suite with the CNV deployment result (Fail/Success): ${results_file}"
-    if [[ "$deployment_success" == "true" ]]; then
-      add_testcase "cnv_deployment" $deployment_success
-    else
-      add_testcase "cnv_deployment" $deployment_success
-    fi
+    add_testcase "cnv_deployment" $deployment_success
     yq eval -n --output-format=xml -I0 '.testsuite = {"name": "CNV-lp-interop", "tests": env(TOTAL), "failures": env(FAILURES), "testcase": env(TESTCASES)}' > $results_file
 }
 
