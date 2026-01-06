@@ -43,7 +43,14 @@ function generateResultFileForCNVDeployment() {
     results_file="${1}"
 
     echo "Generating a test suite with the CNV deployment result (Fail/Success): ${results_file}"
-    yq eval -n --output-format=xml -I0 '.testsuite = {"name": "CNV-lp-interop", "tests": env(TOTAL), "failures": env(FAILURES), "testcase": env(TESTCASES)}' > $results_file
+    yq eval -n --output-format=xml -I0 '
+      .testsuite = {
+        "+@name": "CNV-lp-interop",
+        "+@tests": env(TOTAL),
+        "+@failures": env(FAILURES),
+        "testcase": env(TESTCASES)
+      }
+    ' > $results_file
 }
 
 function cleanup() {
