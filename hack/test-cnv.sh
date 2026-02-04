@@ -81,7 +81,7 @@ skip_tests+=('test_id:4659')
 # Skipping "Delete a VirtualMachineInstance with ACPI and 0 grace period seconds" due to a bug
 skip_tests+=('test_id:1652')
 
-# Skipping a few unreliable tests
+# Skipping a few unrealiable tests
 skip_tests+=('rfe_id:273')
 skip_tests+=('test_id:1304')
 skip_tests+=('test_id:1615')
