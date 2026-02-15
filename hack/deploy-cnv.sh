@@ -120,9 +120,17 @@ function get_cnv_channel() {
     add_testcase "get_cnv_channel" "true"
 }
 
+function get_konflux_version() {
+    local cnv_version_major_minor=$1
+    # Current version schema is v<MAJOR>-<MINOR>
+    echo -n "${cnv_version_major_minor}" | sed -nr 's|([0-9]+)\.([0-9]+)(\.([0-9]+))?|v\1-\2|p'
+}
+
 # Apply IDMS configuration
 function apply_idms() {
-    oc apply -f "${SCRIPT_DIR}/cnv_idms.yaml"
+    local konflux_version=$(get_konflux_version "${CNV_VERSION}")
+    sed "s|__CNV_VERSION__|${konflux_version}|g" "${SCRIPT_DIR}/cnv_idms.yaml" \
+        | oc apply -f -
     add_testcase "apply_idms" "true"
 }
 
