@@ -12,7 +12,7 @@ spec:
   imageDigestMirrors:
   - source: registry.redhat.io/container-native-virtualization
     mirrors:
-      - quay.io/openshift-virtualization/konflux-builds/v4-19
+      - quay.io/openshift-virtualization/konflux-builds/v${OCP_VERSION/./-}
       - brew.registry.redhat.io/container-native-virtualization      
 EOF
 
