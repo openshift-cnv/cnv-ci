@@ -1,7 +1,8 @@
 FROM src
 
-RUN dnf install -y --nodocs --setopt=install_weak_deps=False \
-    expect sqlite jq \
+# Install required utils
+RUN dnf update -y \
+    && dnf install -y jq curl \
     && dnf clean all \
     && rm -rfv \
         /var/cache/dnf \
@@ -9,5 +10,3 @@ RUN dnf install -y --nodocs --setopt=install_weak_deps=False \
         /var/log/dnf.* \
         /var/log/hawkey.log \
         /var/cache/ldconfig
-
-COPY oc /usr/bin/oc
