@@ -2,23 +2,18 @@
 
 set -euxo pipefail
 
-echo "applying imageContentSourcePolicy"
+echo "applying ImageDigestMirrorSet"
 oc apply -f - <<EOF
-apiVersion: operator.openshift.io/v1alpha1
-kind: ImageContentSourcePolicy
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
 metadata:
-  name: brew-registry
+  name: konflux-registry
 spec:
-  repositoryDigestMirrors:
-  - mirrors:
-    - brew.registry.redhat.io
-    source: registry.redhat.io
-  - mirrors:
-    - brew.registry.redhat.io
-    source: registry.stage.redhat.io
-  - mirrors:
-    - brew.registry.redhat.io
-    source: registry-proxy.engineering.redhat.com
+  imageDigestMirrors:
+  - source: registry.redhat.io/container-native-virtualization
+    mirrors:
+      - brew.registry.redhat.io/container-native-virtualization
+      - quay.io/openshift-virtualization/konflux-builds/v4-21
 EOF
 
 echo "waiting for update to start"
