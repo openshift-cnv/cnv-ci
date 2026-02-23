@@ -12,12 +12,8 @@ spec:
   imageDigestMirrors:
   - source: registry.redhat.io/container-native-virtualization
     mirrors:
-      - brew.registry.redhat.io/container-native-virtualization
       - quay.io/openshift-virtualization/konflux-builds/v4-21
-  - source: registry.redhat.io/container-native-virtualization/hco-bundle-registry
-    mirrors:
-      - brew.registry.redhat.io/rh-osbs/container-native-virtualization-hco-bundle-registry
-      - quay.io/openshift-virtualization/konflux-builds/v4-21/hco-bundle-registry-rhel9  
+      - brew.registry.redhat.io/container-native-virtualization      
 EOF
 
 echo "waiting for update to start"
