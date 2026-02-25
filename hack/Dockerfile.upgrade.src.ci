@@ -1,6 +1,8 @@
 FROM src
 
-RUN dnf install -y --nodocs --setopt=install_weak_deps=False \
+LABEL source="cnv-ci/hack/Dockerfile.upgrade.src.ci"
+
+RUN dnf install -y --allowerasing --nodocs --setopt=install_weak_deps=False \
     expect sqlite jq \
     && dnf clean all \
     && rm -rfv \
