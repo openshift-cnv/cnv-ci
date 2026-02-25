@@ -63,6 +63,7 @@ function cleanup() {
         echo "Error during deployment: exit status: $rv"
         make dump-state
         echo "*** CNV deployment failed ***"
+        add_testcase "deploy_cnv" "false"
     fi
     generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml"
     exit $rv
