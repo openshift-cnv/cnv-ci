@@ -1,0 +1,14 @@
+FROM src
+
+LABEL source="cnv-ci/hack/Dockerfile.test.src.ci"
+
+# Install required utils
+RUN dnf update -y \
+    && dnf install -y --allowerasing --nodocs --setopt=install_weak_deps=False jq curl \
+    && dnf clean all \
+    && rm -rfv \
+        /var/cache/dnf \
+        /var/lib/dnf \
+        /var/log/dnf.* \
+        /var/log/hawkey.log \
+        /var/cache/ldconfig

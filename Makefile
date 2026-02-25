@@ -15,8 +15,8 @@ disable_default_catalog_source:
 update_pull_secret:
 	hack/update-pull-secret.sh
 
-set_imagecontentsourcepolicy:
-	hack/set-imagecontentsourcepolicy.sh
+set_imagedigestmirrorset:
+	hack/set-imagedigestmirrorset.sh
 
 deploy_cnv:
 	hack/deploy-cnv.sh
