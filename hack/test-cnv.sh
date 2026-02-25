@@ -9,8 +9,10 @@ echo "get matching kubevirt release from the build"
 VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].image}')
 
 if [ "$PRODUCTION_RELEASE" = "false" ]; then
-  # In case of a pre-release build, use the brew registry for the virt-operator image pullspec
-  VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE//registry.redhat.io\/container-native-virtualization\//brew.registry.redhat.io\/rh-osbs\/container-native-virtualization-}
+  # In case of a pre-release build, use the quay registry (Konflux builds) for the virt-operator image pullspec
+  oldPrefix='registry.redhat.io/container-native-virtualization/'
+  newPrefix="quay.io/openshift-virtualization/konflux-builds/v${CNV_VERSION/./-}/" # NOTE: for Konflux builds 4.x -> v4-x
+  VIRT_OPERATOR_IMAGE="${VIRT_OPERATOR_IMAGE/${oldPrefix}/${newPrefix}}"
 fi
 KUBEVIRT_TAG=$(oc image info -a /tmp/authfile.new ${VIRT_OPERATOR_IMAGE} -o json --filter-by-os=linux/amd64 | jq '.config.config.Labels["upstream-version"]')
 KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1}' | tr -d '"')
