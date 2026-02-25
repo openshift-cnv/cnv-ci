@@ -63,7 +63,6 @@ function cleanup() {
         echo "Error during deployment: exit status: $rv"
         make dump-state
         echo "*** CNV deployment failed ***"
-        add_testcase "deploy_cnv" "false"
     fi
     generateResultFileForCNVDeployment "${ARTIFACT_DIR}/junit_cnv_deploy.xml"
     exit $rv
@@ -166,6 +165,9 @@ trap "cleanup" INT TERM EXIT
 
 # Deployment XML result file setup
 install_yq_if_not_exists
+# tmp for debugging
+add_testcase "deploy_cnv" "false"
+
 
 echo "OCP_VERSION: $OCP_VERSION"
 
