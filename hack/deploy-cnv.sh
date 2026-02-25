@@ -164,9 +164,6 @@ trap "cleanup" INT TERM EXIT
 
 # Deployment XML result file setup
 install_yq_if_not_exists
-# tmp for debugging
-add_testcase "deploy_cnv" "false"
-
 
 echo "OCP_VERSION: $OCP_VERSION"
 
