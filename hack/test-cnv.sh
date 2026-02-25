@@ -10,7 +10,7 @@ VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o 
 
 if [ "$PRODUCTION_RELEASE" = "false" ]; then
   # In case of a pre-release build, use the konflux builds registry for the virt-operator image pullspec
-  VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE//registry.redhat.io\/container-native-virtualization\//quay.io\/openshift-virtualization\/konflux-builds\/v${CNV_VERSION/./-}\/}
+  VIRT_OPERATOR_IMAGE=${VIRT_OPERATOR_IMAGE//registry.redhat.io\/container-native-virtualization\//quay.io\/openshift-virtualization\/konflux-builds\/v${OCP_VERSION/./-}\/}
 fi
 KUBEVIRT_TAG=$(oc image info -a /tmp/authfile.new ${VIRT_OPERATOR_IMAGE} -o json --filter-by-os=linux/amd64 | jq '.config.config.Labels["upstream-version"]')
 KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1}' | tr -d '"')
