@@ -138,7 +138,8 @@ function get_cnv_channel() {
 
 # Apply IDMS configuration
 function apply_idms() {
-    oc apply -f "${SCRIPT_DIR}/cnv_idms.yaml"
+    local cnv_version_dash="v${CNV_VERSION/./-}"
+    sed "s/__CNV_VERSION__/${cnv_version_dash}/" "${SCRIPT_DIR}/cnv_idms.yaml" | oc apply -f -
     add_testcase "apply_idms" "true"
 }
 
