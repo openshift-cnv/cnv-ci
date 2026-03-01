@@ -7,6 +7,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export TOTAL=0
 export FAILURES=0
 export TESTCASES="[]"
+unset CNV_SUBSCRIPTION_CHANNEL
 
 function install_yq_if_not_exists() {
     # Install yq manually if not found in image
@@ -98,6 +99,17 @@ function get_cnv_catalog_image() {
     add_testcase "get_cnv_catalog_image" "true"
 }
 
+function latest_cnv_in_production() {
+  if oc get packagemanifest -o json | jq -r '.items[] | select(.status.catalogSource=="redhat-operators" and .metadata.name=="kubevirt-hyperconverged")' | grep -q kubevirt-hyperconverged-operator.v$OCP_VERSION
+  then
+    echo "${OCP_VERSION}"
+  else
+    # CNV $OCP_VERSION was not found in the production catalog of $OCP_VERSION. Using the production catalog of one version below.
+    ONE_LOWER=$(awk -v v="$OCP_VERSION" 'BEGIN { v*=100; v-=1; printf "%.2f\n", v/100 }')
+    echo "${ONE_LOWER}"
+  fi
+}
+
 function get_cnv_channel() {
     # Environment variable has higher priority
     if [ -n "${CNV_SUBSCRIPTION_CHANNEL-}" ]; then
@@ -173,7 +185,20 @@ CNV_VERSION=${CNV_VERSION:-${OCP_VERSION}}
 oc create ns "${TARGET_NAMESPACE}"
 
 if [ "$PRODUCTION_RELEASE" = "true" ]; then
-    CNV_CATALOG_SOURCE='redhat-operators'
+  # if the CNV version exists in the existing prod catalog source - use it.
+  # if not, use the prod catalog of the previous minor version.
+    CNV_SUBSCRIPTION_CHANNEL='stable'
+    version=$(latest_cnv_in_production)
+    if [ "$version" = "$OCP_VERSION" ]
+    then
+      CNV_CATALOG_SOURCE='redhat-operators'
+    else
+      echo "creating a catalog source for production v$version"
+      CNV_CATALOG_SOURCE='cnv-catalog-source'
+      CNV_CATALOG_IMAGE=registry.redhat.io/redhat/redhat-operator-index:v$version
+      "$SCRIPT_DIR"/create-cnv-catalogsource.sh "${CNV_CATALOG_IMAGE}"
+    fi
+
 else
     CNV_CATALOG_SOURCE='cnv-catalog-source'
     apply_idms || add_testcase "apply_idms" "false"
