@@ -56,6 +56,22 @@ function get_cnv_channel() {
         )
     fi
 
+    # Fallback, get channel from mapping file
+    if [ -z "${CNV_SUBSCRIPTION_CHANNEL-}" ]; then
+        CNV_SUBSCRIPTION_CHANNEL=$(
+          jq -r '."'"${CNV_VERSION}"'".channel // empty' version-mapping.json
+        )
+    fi
+
+    # nightly channel is only valid for brew catalog, not for redhat-operators
+    if [ "$PRODUCTION_RELEASE" = "true" ] && [ "${CNV_SUBSCRIPTION_CHANNEL-}" = "nightly" ]; then
+        if oc get packagemanifest kubevirt-hyperconverged -n openshift-marketplace -o jsonpath='{.status.channels[*].name}' 2>/dev/null | grep -qw candidate; then
+            CNV_SUBSCRIPTION_CHANNEL="candidate"
+        else
+            CNV_SUBSCRIPTION_CHANNEL="stable"
+        fi
+    fi
+
     # Ultimate fallback, use stable channel
     : "${CNV_SUBSCRIPTION_CHANNEL:=stable}"
 }
