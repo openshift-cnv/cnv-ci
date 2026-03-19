@@ -38,8 +38,8 @@
     "bundle_version": "v4.13.12.rhel9-243"
   },
   "4.14": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1117635",
-    "bundle_version": "v4.14.17.rhel9-53",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1118264",
+    "bundle_version": "v4.14.17.rhel9-55",
     "channel": "nightly"
   },
   "4.15": {
