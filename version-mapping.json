@@ -48,8 +48,8 @@
     "channel": "candidate"
   },
   "4.16": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1125441",
-    "bundle_version": "v4.16.35.rhel9-2",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1126353",
+    "bundle_version": "v4.16.35.rhel9-5",
     "channel": "candidate"
   },
   "4.17": {
