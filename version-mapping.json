@@ -1,7 +1,7 @@
 {
   "4.99": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1128662",
-    "bundle_version": "v4.99.0.rhel9-2738",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132361",
+    "bundle_version": "v4.99.0.rhel9-2757",
     "channel": "dev-preview"
   },
   "4.6": {
@@ -29,23 +29,23 @@
     "bundle_version": "v4.11.9-170"
   },
   "4.12": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1082181",
-    "bundle_version": "v4.12.22-4",
-    "channel": "stable"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132358",
+    "bundle_version": "v4.12.23-72",
+    "channel": "nightly"
   },
   "4.13": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:1002438",
     "bundle_version": "v4.13.12.rhel9-245"
   },
   "4.14": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1124257",
-    "bundle_version": "v4.14.18.rhel9-15",
-    "channel": "candidate"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132362",
+    "bundle_version": "v4.14.18.rhel9-36",
+    "channel": "nightly"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1106169",
-    "bundle_version": "v4.15.13.rhel9-25",
-    "channel": "stable"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132359",
+    "bundle_version": "v4.15.15.rhel9-25",
+    "channel": "nightly"
   },
   "4.16": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132118",
@@ -53,8 +53,8 @@
     "channel": "nightly"
   },
   "4.17": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1125834",
-    "bundle_version": "v4.17.44.rhel9-45",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132365",
+    "bundle_version": "v4.17.46.rhel9-6",
     "channel": "nightly"
   },
   "4.18": {
@@ -68,8 +68,8 @@
     "channel": "candidate"
   },
   "4.20": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132117",
-    "bundle_version": "v4.20.13.rhel9-5",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132369",
+    "bundle_version": "v4.20.13.rhel9-6",
     "channel": "nightly"
   },
   "4.21": {
