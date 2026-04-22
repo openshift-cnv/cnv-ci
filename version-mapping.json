@@ -1,7 +1,7 @@
 {
   "4.99": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1122605",
-    "bundle_version": "v4.99.0.rhel9-2704",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132361",
+    "bundle_version": "v4.99.0.rhel9-2757",
     "channel": "dev-preview"
   },
   "4.6": {
@@ -29,8 +29,8 @@
     "bundle_version": "v4.11.9-170"
   },
   "4.12": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1127812",
-    "bundle_version": "v4.12.23-62",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132358",
+    "bundle_version": "v4.12.23-72",
     "channel": "nightly"
   },
   "4.13": {
@@ -38,14 +38,14 @@
     "bundle_version": "v4.13.12.rhel9-243"
   },
   "4.14": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1131167",
-    "bundle_version": "v4.14.18.rhel9-33",
-    "channel": "candidate"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132362",
+    "bundle_version": "v4.14.18.rhel9-36",
+    "channel": "nightly"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1128548",
-    "bundle_version": "v4.15.15.rhel9-16",
-    "channel": "candidate"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132359",
+    "bundle_version": "v4.15.15.rhel9-25",
+    "channel": "nightly"
   },
   "4.16": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:1131168",
@@ -53,8 +53,8 @@
     "channel": "candidate"
   },
   "4.17": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1131156",
-    "bundle_version": "v4.17.46.rhel9-1",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132365",
+    "bundle_version": "v4.17.46.rhel9-6",
     "channel": "nightly"
   },
   "4.18": {
@@ -68,9 +68,9 @@
     "channel": "candidate"
   },
   "4.20": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1124264",
-    "bundle_version": "v4.20.10.rhel9-1",
-    "channel": "candidate"
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1132369",
+    "bundle_version": "v4.20.13.rhel9-6",
+    "channel": "nightly"
   },
   "4.21": {
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:1126087",
