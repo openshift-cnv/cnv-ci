@@ -4,7 +4,7 @@ set -euxo pipefail
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-HCO_KIND="HyperConverged"
+HCO_KIND="hyperconvergeds.v1beta1.hco.kubevirt.io"
 HCO_CR="kubevirt-hyperconverged"
 
 echo "waiting for hco-operator deployment to be created"

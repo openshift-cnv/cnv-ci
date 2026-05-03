@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CMD=${CMD:-oc}
+HCO_KIND="hyperconvergeds.v1beta1.hco.kubevirt.io"
 
 function RunCmd {
     cmd=$@
@@ -64,11 +65,11 @@ echo $1
 RunCmd "${CMD} get pods -n ${CNV_NAMESPACE}"
 RunCmd "${CMD} get subscription -n ${CNV_NAMESPACE} -o yaml"
 RunCmd "${CMD} get deployment/hco-operator -n ${CNV_NAMESPACE} -o yaml"
-RunCmd "${CMD} get hyperconvergeds -n ${CNV_NAMESPACE} kubevirt-hyperconverged -o yaml"
+RunCmd "${CMD} get ${HCO_KIND} -n ${CNV_NAMESPACE} kubevirt-hyperconverged -o yaml"
 
-ShowOperatorSummary  hyperconvergeds.hco.kubevirt.io kubevirt-hyperconverged ${CNV_NAMESPACE}
+ShowOperatorSummary  ${HCO_KIND} kubevirt-hyperconverged ${CNV_NAMESPACE}
 
-RELATED_OBJECTS=`${CMD} get hyperconvergeds.hco.kubevirt.io kubevirt-hyperconverged -n ${CNV_NAMESPACE} -o go-template='{{range .status.relatedObjects }}{{if .namespace }}{{ printf "%s %s %s\n" .kind .name .namespace }}{{ else }}{{ printf "%s %s .\n" .kind .name }}{{ end }}{{ end }}'`
+RELATED_OBJECTS=`${CMD} get ${HCO_KIND} kubevirt-hyperconverged -n ${CNV_NAMESPACE} -o go-template='{{range .status.relatedObjects }}{{if .namespace }}{{ printf "%s %s %s\n" .kind .name .namespace }}{{ else }}{{ printf "%s %s .\n" .kind .name }}{{ end }}{{ end }}'`
 
 echo "${RELATED_OBJECTS}" | while read line; do 
 
