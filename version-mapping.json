@@ -63,13 +63,13 @@
     "channel": "candidate"
   },
   "4.20": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1149093",
-    "bundle_version": "v4.20.15.rhel9-42",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1149471",
+    "bundle_version": "v4.20.16.rhel9-1",
     "channel": "candidate"
   },
   "4.19": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1149083",
-    "bundle_version": "v4.19.25.rhel9-43",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1149486",
+    "bundle_version": "v4.19.26.rhel9-1",
     "channel": "candidate"
   },
   "4.21": {
