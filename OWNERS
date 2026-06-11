@@ -4,10 +4,12 @@ approvers:
 - fabiand
 - orenc1
 - tiraboschi
+- rabin-io
 reviewers:
 - fabiand
 - orenc1
 - tiraboschi
+- rabin-io
 emeritus_approvers:
 - dhiller
 - rmohr
