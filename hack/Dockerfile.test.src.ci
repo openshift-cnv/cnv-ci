@@ -1,6 +1,8 @@
-FROM src
+FROM quay.io/centos/centos:stream10
 
 LABEL source="cnv-ci/hack/Dockerfile.test.src.ci"
+
+COPY --from=docker.io/mikefarah/yq /usr/bin/yq /usr/bin/yq
 
 # Install required utils
 RUN dnf update -y \
@@ -11,4 +13,5 @@ RUN dnf update -y \
         /var/lib/dnf \
         /var/log/dnf.* \
         /var/log/hawkey.log \
-        /var/cache/ldconfig
+        /var/cache/ldconfig \
+    && yq --version
