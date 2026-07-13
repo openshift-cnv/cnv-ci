@@ -43,13 +43,22 @@ fi
 echo "waiting for HyperConverged operator to be available"
 oc wait "${HCO_KIND}" "${HCO_CR}" -n ${TARGET_NAMESPACE} --for condition=Available --timeout=30m
 
-echo "Enable KubeVirt RebootPolicy feature gate (interop e2e exercises reboot policy specs)."
-oc annotate "${HCO_KIND}" "${HCO_CR}" \
-  --namespace="${TARGET_NAMESPACE}" \
-  --overwrite \
-  kubevirt.kubevirt.io/jsonpatch='[
-    {"op": "add", "path": "/spec/configuration/developerConfiguration/featureGates/-", "value": "RebootPolicy"}
-  ]'
+if [ -n "${CNV_VERSION:-}" ]; then
+  cnv_major="${CNV_VERSION%%.*}"
+  cnv_minor="${CNV_VERSION#*.}"
+fi
 
-echo "waiting for HyperConverged operator to be available (again)"
-oc wait "${HCO_KIND}" "${HCO_CR}" -n "${TARGET_NAMESPACE}" --for=condition=Available --timeout=15m
+if [ "${cnv_major:-0}" -ge 5 ] 2>/dev/null || { [ "${cnv_major:-0}" -eq 4 ] && [ "${cnv_minor:-0}" -ge 23 ]; } 2>/dev/null; then
+  echo "CNV_VERSION=${CNV_VERSION} >= 4.23 / >= 5.0: skipping RebootPolicy feature gate activation (not exposed by HCO)."
+else
+  echo "CNV_VERSION=${CNV_VERSION:-unknown} < 4.23: enabling RebootPolicy feature gate via jsonpatch."
+  oc annotate "${HCO_KIND}" "${HCO_CR}" \
+    --namespace="${TARGET_NAMESPACE}" \
+    --overwrite \
+    kubevirt.kubevirt.io/jsonpatch='[
+      {"op": "add", "path": "/spec/configuration/developerConfiguration/featureGates/-", "value": "RebootPolicy"}
+    ]'
+
+  echo "waiting for HyperConverged operator to be available (again)"
+  oc wait "${HCO_KIND}" "${HCO_CR}" -n "${TARGET_NAMESPACE}" --for=condition=Available --timeout=15m
+fi
