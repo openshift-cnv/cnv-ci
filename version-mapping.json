@@ -34,23 +34,23 @@
     "channel": "candidate"
   },
   "4.13": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1197852",
-    "bundle_version": "v4.13.15.rhel9-7",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198612",
+    "bundle_version": "v4.13.15.rhel9-8",
     "channel": "candidate"
   },
   "4.14": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1197911",
-    "bundle_version": "v4.14.29.rhel9-8",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198574",
+    "bundle_version": "v4.14.29.rhel9-9",
     "channel": "candidate"
   },
   "4.15": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1197856",
-    "bundle_version": "v4.15.18.rhel9-7",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198633",
+    "bundle_version": "v4.15.18.rhel9-8",
     "channel": "candidate"
   },
   "4.16": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198365",
-    "bundle_version": "v4.16.44.rhel9-7",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198573",
+    "bundle_version": "v4.16.45.rhel9-1",
     "channel": "candidate"
   },
   "4.17": {
@@ -59,13 +59,13 @@
     "channel": "candidate"
   },
   "4.18": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198007",
-    "bundle_version": "v4.18.46.rhel9-8",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198553",
+    "bundle_version": "v4.18.47.rhel9-1",
     "channel": "candidate"
   },
   "4.19": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1197957",
-    "bundle_version": "v4.19.34.rhel9-8",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198571",
+    "bundle_version": "v4.19.35.rhel9-1",
     "channel": "candidate"
   },
   "4.20": {
@@ -89,8 +89,8 @@
     "channel": "candidate"
   },
   "5.0": {
-    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198414",
-    "bundle_version": "v5.0.0.rhel9-52",
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1198589",
+    "bundle_version": "v5.0.0.rhel9-53",
     "channel": "candidate"
   }
 }
