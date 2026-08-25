@@ -345,3 +345,19 @@ retry_backoff() {
         ((count++))
     done
 }
+
+oc::getClusterVersionXYZ() {
+    oc get clusterversion version -o jsonpath='{.status.desired.version}'
+}
+
+oc::getClusterVersionXY() {
+    oc::getClusterVersionXYZ | cut -d. -f1,2
+}
+
+oc::getClusterVersionX() {
+    oc::getClusterVersionXYZ | cut -d. -f1
+}
+
+oc::getClusterPullSecret() {
+    oc get secret/pull-secret -n openshift-config --template='{{index .data ".dockerconfigjson" | base64decode}}'
+}
