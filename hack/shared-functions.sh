@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo_debug()
+{
+    echo "$@" >&2
+}
+
 # Run a command until it succeeds or the maximum number of retries is reached.
 #
 # Arguments:
@@ -360,4 +365,154 @@ oc::getClusterVersionX() {
 
 oc::getClusterPullSecret() {
     oc get secret/pull-secret -n openshift-config --template='{{index .data ".dockerconfigjson" | base64decode}}'
+}
+
+function download_virtctl() {
+    echo "[INFO] Downloading virtctl to ${BIN_FOLDER} .." >&2
+    curl -k -fsS "${virtctl_url}" | tar -C "${BIN_FOLDER}" \
+      --transform='flags=r;s/virtctl-linux-.*/virtctl/' -xzf -
+
+    chmod +x "${BIN_FOLDER}/virtctl"
+    echo "[INFO] virtctl installed: $("${BIN_FOLDER}/virtctl" version --client 2>/dev/null | head -1 || echo unknown)" >&2
+}
+
+# shellcheck disable=SC2329
+function virtctl_download_ready() {
+  curl -k -fsS -o /dev/null --connect-timeout 15 --max-time 120 "$1" 2>/dev/null
+}
+
+function install_yq_if_not_exists() {
+    # Install yq manually if not found in image
+    echo "Checking if yq exists"
+    cmd_yq="$(yq --version 2>/dev/null || true)"
+    if [ -n "$cmd_yq" ]; then
+        echo "yq version: $cmd_yq"
+    else
+        echo "Installing yq"
+        mkdir -p /tmp/bin
+        export PATH=$PATH:/tmp/bin/
+        curl -L "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_$(uname -m | sed 's/aarch64/arm64/;s/x86_64/amd64/')" \
+         -o /tmp/bin/yq && chmod +x /tmp/bin/yq
+    fi
+}
+
+function mapTestsForComponentReadiness() {
+
+    [[ ${MAP_TESTS:-false} != "true" ]] && return
+
+    results_file="${1}"
+    echo "Patching Tests Result File: ${results_file}"
+    if [ -f "${results_file}" ]; then
+        install_yq_if_not_exists
+        echo "Mapping Test Suite Name To: CNV-lp-interop"
+        yq eval -px -ox -iI0 '.testsuites.testsuite.+@name="CNV-lp-interop"' "${results_file}"
+    fi
+}
+
+# Description:
+#   Polls all CatalogSource resources in the cluster until they are all healthy and ready,
+#   or until a timeout is reached.
+# Usage:
+#   make_sure_all_catalog_source_are_healthy <timeout-seconds> [<poll-interval-seconds>]
+make_sure_all_catalog_source_are_healthy() {
+  local timeout=${1:?"Error: timeout (in seconds) is required as first argument"}
+  local interval=${2:-5}
+  local start_time=${SECONDS}
+
+  local CS_NAME="${CNV_IIB_CATALOG_NAME}"
+  local CS_IMAGE="${CNV_CATALOG_IMAGE}"
+
+  echo_debug "Waiting for all CatalogSource resources to become healthy (timeout: ${timeout}s, interval: ${interval}s)..."
+
+  while true; do
+    # Fetch all CatalogSources and count those not READY or explicitly unhealthy
+    local not_ready_count
+    not_ready_count=$(oc get catalogsource --all-namespaces -o json \
+      | jq '[.items[] | select(
+            .status.connectionState.lastObservedState != "READY" or
+            (.status.health.healthy? == false)
+          )] | length')
+
+    if [[ "$not_ready_count" -eq 0 ]]; then
+      echo_debug "All CatalogSource resources are healthy and ready."
+      return 0
+    fi
+
+    # Check for timeout
+    local elapsed=$(( SECONDS - start_time ))
+    if (( elapsed >= timeout )); then
+      echo_debug "Timeout after ${elapsed}s: ${not_ready_count} CatalogSource(s) are still not healthy or ready."
+      oc get catalogsource --all-namespaces -o yaml | tee "${ARTIFACT_DIR}/catalogsources.yaml"
+
+      echo_debug '[DEBUG] Dumping the state of all subscriptions'
+      oc get subscriptions.operators -A -o yaml | tee "${ARTIFACT_DIR}/subscriptions.yaml"
+
+      echo_debug "Checking catalog source status..."
+      # Check if catalog source still exists (it might have been deleted by OpenShift)
+      if oc get catalogsource "${CS_NAME}" -n openshift-marketplace &>/dev/null; then
+        echo_debug "Catalog source still exists, showing details:"
+        oc get catalogsource "${CS_NAME}" -n openshift-marketplace -o yaml | tee "${ARTIFACT_DIR}/catalogsource.${CS_NAME}.yaml"
+        echo_debug ""
+        echo_debug "Catalog source pod status:"
+        oc get pods -n openshift-marketplace -l olm.catalogSource="${CS_NAME}" -o wide >&2 || true
+        echo_debug ""
+        echo_debug "Catalog source events:"
+        oc get events -n openshift-marketplace --field-selector involvedObject.name="${CS_NAME}" --sort-by='.lastTimestamp' | tail -20 >&2 || true
+      else
+        echo_debug "[ERROR] Catalog source ${CS_NAME} was deleted by OpenShift (likely due to image pull failure)."
+        echo_debug "Image: ${CS_IMAGE}"
+        echo_debug "This usually indicates:"
+        echo_debug "  - Image does not exist or is inaccessible"
+        echo_debug "  - Authentication/authorization issues"
+        echo_debug "  - Network connectivity problems"
+        echo_debug "  - Invalid image reference"
+      fi
+
+      return 1
+    fi
+
+    echo_debug "${not_ready_count} CatalogSource(s) not ready or unhealthy. Retrying in ${interval}s..."
+    sleep "${interval}"
+  done
+}
+
+# Wait until master and worker MCP are Updated
+# or timeout after 90min (default).
+wait_for_mcp_to_update() {
+
+    local timeout_minutes=${1:-90}
+    local poll_interval_seconds=30
+    local max_attempts=$(( timeout_minutes * 60 / poll_interval_seconds ))
+    local attempt=0
+
+    echo "Waiting for MCPs to update (timeout: ${timeout_minutes} minutes)"
+
+    while true; do
+        attempt=$((attempt+1))
+
+        if oc wait mcp --all --for condition=updated --timeout="${poll_interval_seconds}s"; then
+            echo "MCPs are updated."
+            return 0
+        fi
+
+        if (( attempt >= max_attempts )); then
+            echo "Error: MCPs did not update within ${timeout_minutes} minutes." >&2
+            return 1
+        fi
+
+        echo "Attempt ${attempt}/${max_attempts}: MCPs not yet updated, retrying in ${poll_interval_seconds} seconds..."
+    done
+}
+
+mcp.pause()
+{
+    #shellcheck disable=SC2046
+    oc patch --type=merge --patch='{"spec":{"paused": true}}' $(oc get mcp -o name)
+}
+
+# Resume master and worker MCP.
+mcp.resume()
+{
+    #shellcheck disable=SC2046
+    oc patch --type=merge --patch='{"spec":{"paused": false}}' $(oc get mcp -o name)
 }
