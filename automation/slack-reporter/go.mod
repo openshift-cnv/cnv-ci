@@ -1,10 +1,10 @@
 module slack-reporter
 
-go 1.23
+go 1.25.0
 
 require (
 	github.com/slack-go/slack v0.15.0
-	golang.org/x/net v0.35.0
+	golang.org/x/net v0.55.0
 )
 
 require (
