@@ -27,11 +27,9 @@ upgrade_cnv:
 	hack/upgrade-cnv.sh
 
 test_cnv:
-	hack/patch-hco-pre-test.sh
 	hack/test-cnv.sh
 
 test_cnv_arm64:
-	hack/patch-hco-pre-test.sh
 	hack/test-cnv-arm64.sh
 
 quicklab:
