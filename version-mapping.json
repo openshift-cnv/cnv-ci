@@ -82,5 +82,10 @@
     "index_image": "brew.registry.redhat.io/rh-osbs/iib:1170067",
     "bundle_version": "v4.22.2.rhel9-12",
     "channel": "candidate"
+  },
+  "5.0": {
+    "index_image": "brew.registry.redhat.io/rh-osbs/iib:1247515",
+    "bundle_version": "v5.0.1.rhel9-6",
+    "channel": "candidate"
   }
 }
